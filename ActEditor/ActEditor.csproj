@@ -378,6 +378,7 @@
     </Compile>
     <EmbeddedResource Include="Resources\Scripts\script11_palette_sheet.cs" />
     <EmbeddedResource Include="Resources\Scripts\script12_remove_unused_palette.cs" />
+    <EmbeddedResource Include="Resources\Scripts\script13_remove_all_sounds.cs" />
     <EmbeddedResource Include="Resources\Scripts\dummy_script.cs" />
     <Compile Include="Tools\PaletteEditorTool\ResizeDialog.xaml.cs">
       <DependentUpon>ResizeDialog.xaml</DependentUpon>
