@@ -579,7 +579,7 @@ namespace ActEditor.ApplicationConfiguration {
 
 		#region Program's internal configuration and information
 
-		public static string PublicVersion => "1.3.4";
+		public static string PublicVersion => "Tyler Mods (1.3.4)";
 		public static string Author => "Tokeiburu";
 		public static string ProgramName => "Act Editor";
 		public static string RealVersion => Assembly.GetEntryAssembly().GetName().Version.ToString();

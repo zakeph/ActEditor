@@ -259,6 +259,7 @@ namespace ActEditor.Core {
 			_scriptLoader.AddScriptsToMenu(new EditClearPalette(), this, _mainMenu);
 			_scriptLoader.AddScriptsToMenu(new EditPalette(), this, _mainMenu);
 			_scriptLoader.AddScriptsToMenu(new EditPaletteAdvanced(), this, _mainMenu);
+			_scriptLoader.AddScriptsToMenu(new EditBgra32Tones(), this, _mainMenu);
 			_scriptLoader.AddScriptsToMenu(new ImportPaletteFrom(), this, _mainMenu);
 			
 			_scriptLoader.AddScriptsToMenu(new EditAnchor(), this, _mainMenu);
@@ -622,6 +623,7 @@ namespace ActEditor.Core {
 		private void _specialLoad(Act act, string fileName) {
 			act.LoadedPath = fileName + ".act";
 			act.Sprite.Save(fileName + ".spr");
+			SpriteSaveCompatibility.NormalizePaletteTail(fileName + ".spr");
 			act.Save(fileName + ".act");
 
 			_tabEngine.Open(fileName + ".act", isNew: true);

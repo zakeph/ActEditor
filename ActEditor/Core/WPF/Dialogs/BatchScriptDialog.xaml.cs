@@ -162,6 +162,7 @@ namespace ActEditor.Core.WPF.Dialogs {
 						this.Dispatch(delegate {
 							actScript.Execute(act, 0, 0, new int[] { 0 });
 							act.SaveWithSprite(act.LoadedPath, act.LoadedPath.ReplaceExtension(".spr"));
+							SpriteSaveCompatibility.NormalizePaletteTail(act.LoadedPath.ReplaceExtension(".spr"));
 						});
 					}
 				}

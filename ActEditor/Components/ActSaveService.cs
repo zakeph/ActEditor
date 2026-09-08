@@ -153,6 +153,7 @@ namespace ActEditor.Components {
 			var actPath = sc.FilePath.ReplaceExtension(".act");
 
 			act.SaveWithSprite(actPath);
+			SpriteSaveCompatibility.NormalizePaletteTail(actPath.ReplaceExtension(".spr"));
 			act.LoadedPath = actPath;
 			act.Commands.SaveCommandIndex();
 
@@ -168,6 +169,7 @@ namespace ActEditor.Components {
 			var actPath = sc.FilePath.ReplaceExtension(".act");
 
 			act.SaveWithSprite(actPath);
+			SpriteSaveCompatibility.NormalizePaletteTail(actPath.ReplaceExtension(".spr"));
 			File.WriteAllBytes(actPath.ReplaceExtension(".pal"), act.Sprite.Palette.BytePalette);
 			act.LoadedPath = actPath;
 			act.Commands.SaveCommandIndex();
@@ -200,7 +202,9 @@ namespace ActEditor.Components {
 
 		private SaveResult _saveSprOnly(SaveContext sc) {
 			var act = sc.Tab.Act;
-			act.Sprite.Save(sc.FilePath.ReplaceExtension(".spr"));
+			var sprPath = sc.FilePath.ReplaceExtension(".spr");
+			act.Sprite.Save(sprPath);
+			SpriteSaveCompatibility.NormalizePaletteTail(sprPath);
 
 			return new SaveResult();
 		}
@@ -309,6 +313,7 @@ namespace ActEditor.Components {
 				string temp = TemporaryFilesManager.GetTemporaryFilePath("to_grf_{0:0000}");
 
 				act.Sprite.Save(temp + ".spr");
+				SpriteSaveCompatibility.NormalizePaletteTail(temp + ".spr");
 				act.Save(temp + ".act");
 
 				grf.Commands.AddFile(path.RelativePath.ReplaceExtension(".act"), File.ReadAllBytes(temp + ".act"));
@@ -325,7 +330,9 @@ namespace ActEditor.Components {
 		}
 
 		private SaveResult _saveToFileSystem(Act act) {
-			act.Sprite.Save(act.LoadedPath.ReplaceExtension(".spr"));
+			var sprPath = act.LoadedPath.ReplaceExtension(".spr");
+			act.Sprite.Save(sprPath);
+			SpriteSaveCompatibility.NormalizePaletteTail(sprPath);
 			act.Save();
 			act.Commands.SaveCommandIndex();
 

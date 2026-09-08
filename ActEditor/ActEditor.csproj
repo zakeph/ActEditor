@@ -170,6 +170,7 @@
     </Compile>
     <Compile Include="Components\ActSaveService.cs" />
     <Compile Include="Core\ActHelper.cs" />
+    <Compile Include="Core\SpriteSaveCompatibility.cs" />
     <Compile Include="Core\DrawingComponents\GridRenderer.cs" />
     <Compile Include="Core\Scripting\ActScriptLoader.cs" />
     <Compile Include="Core\ListEditCommands\ListEditGroupCommand.cs" />
@@ -379,9 +380,13 @@
     <EmbeddedResource Include="Resources\Scripts\script11_palette_sheet.cs" />
     <EmbeddedResource Include="Resources\Scripts\script12_remove_unused_palette.cs" />
     <EmbeddedResource Include="Resources\Scripts\script13_remove_all_sounds.cs" />
+    <EmbeddedResource Include="Resources\Scripts\script14_sort_palette_light_to_dark.cs" />
     <EmbeddedResource Include="Resources\Scripts\dummy_script.cs" />
     <Compile Include="Tools\PaletteEditorTool\ResizeDialog.xaml.cs">
       <DependentUpon>ResizeDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Tools\PaletteEditorTool\Bgra32EditorDialog.xaml.cs">
+      <DependentUpon>Bgra32EditorDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Tools\PaletteEditorTool\PalettePreset.xaml.cs">
       <DependentUpon>PalettePreset.xaml</DependentUpon>
@@ -617,6 +622,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Tools\PaletteEditorTool\ResizeDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Tools\PaletteEditorTool\Bgra32EditorDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

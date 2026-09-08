@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using GRF.FileFormats.ActFormat;
 using GRF.Image;
-using Utilities;
 
 namespace Scripts {
     public class Script : IActScript {
@@ -23,11 +22,11 @@ namespace Scripts {
         }
 
         public void Execute(Act act, int selectedActionIndex, int selectedFrameIndex, int[] selectedLayerIndexes) {
-            if (act == null || act.Sprite == null || act.Sprite.Palette == null)
+            if (act == null || act.Sprite == null || act.Sprite.Palette == null || act.Sprite.Palette.BytePalette == null)
                 return;
 
             HashSet<byte> unusedIndexes = act.Sprite.GetUnusedPaletteIndexes();
-			byte[] palette = Methods.Copy(act.Sprite.Palette.BytePalette);
+			byte[] palette = _copy(act.Sprite.Palette.BytePalette);
 			
             for (int i = 1; i < 256; i++) {
                 if (unusedIndexes.Contains((byte)i)) {
@@ -42,7 +41,16 @@ namespace Scripts {
         }
 
         public bool CanExecute(Act act, int selectedActionIndex, int selectedFrameIndex, int[] selectedLayerIndexes) {
-            return act != null && act.Sprite != null && act.Sprite.Palette != null;
+            return act != null && act.Sprite != null && act.Sprite.Palette != null && act.Sprite.Palette.BytePalette != null;
         }
+
+		private byte[] _copy(byte[] bytes) {
+			if (bytes == null)
+				return null;
+
+			byte[] copy = new byte[bytes.Length];
+			Buffer.BlockCopy(bytes, 0, copy, 0, bytes.Length);
+			return copy;
+		}
     }
 }

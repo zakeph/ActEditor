@@ -1,4 +1,5 @@
 ﻿using ActEditor.Tools.GrfShellExplorer;
+using ActEditor.Core;
 using GRF.Core;
 using GRF.FileFormats.PalFormat;
 using GRF.FileFormats.SprFormat;
@@ -168,6 +169,7 @@ namespace ActEditor.Tools.PaletteEditorTool {
 				// There's no reason to make the first color unique... It creates issues when comparing palettes as well later.
 				//spr.Palette.MakeFirstColorUnique();
 				spr.Save(file);
+				SpriteSaveCompatibility.NormalizePaletteTail(file);
 			}
 			finally {
 				spr.Palette.EnableRaiseEvents = true;

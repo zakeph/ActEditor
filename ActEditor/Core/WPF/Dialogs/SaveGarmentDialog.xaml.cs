@@ -47,6 +47,7 @@ namespace ActEditor.Core.WPF.Dialogs {
 
 			ListViewDataTemplateHelper.GenerateListViewTemplateNew(_listViewMatches, new ListViewDataTemplateHelper.GeneralColumnInfo[] {
 				new ListViewDataTemplateHelper.GeneralColumnInfo {Header = "SpriteName", DisplayExpression = "SpriteName", ToolTipBinding = "SpriteName", TextAlignment = TextAlignment.Left, TextWrapping = TextWrapping.Wrap, IsFill = true},
+				new ListViewDataTemplateHelper.GeneralColumnInfo {Header = "Type", DisplayExpression = "TypeDisplay", FixedWidth = 55, ToolTipBinding = "SpritePath", TextAlignment = TextAlignment.Left},
 				new ListViewDataTemplateHelper.GeneralColumnInfo {Header = "Ratio", DisplayExpression = "RatioDisplay", FixedWidth = 50, ToolTipBinding = "RatioDisplay", TextAlignment = TextAlignment.Right},
 			}, new DefaultListViewComparer<ActMatch>(), new string[] { "Default", "{DynamicResource TextForeground}" });
 
@@ -197,7 +198,7 @@ namespace ActEditor.Core.WPF.Dialogs {
 			// List all matches
 			var matches = _findClosestkROSpriteSub(_kro_grf, actSource);
 
-			_listViewMatches.ItemsSource = matches.GroupBy(p => p.SpriteName).Select(p => p.First()).OrderByDescending(p => p.Ratio);
+			_listViewMatches.ItemsSource = matches.GroupBy(p => p.SpritePath).Select(p => p.First()).OrderByDescending(p => p.IsOfficialGarment).ThenByDescending(p => p.Ratio);
 
 			if (matches.Count > 0) {
 				_listViewMatches.SelectedItem = matches.First();
@@ -211,13 +212,25 @@ namespace ActEditor.Core.WPF.Dialogs {
 				return;
 
 			try {
-				string actPath = String.Format(EncodingService.FromAnsiToDisplayEncoding(@"data\sprite\·Îºê\{0}\{1}\{2}_{3}.act"), match.SpriteName, GrfStrings.GenderMale, "¼Ò¿ï¸µÄ¿", GrfStrings.GenderMale);
+				_selectedMatch = match;
+				string actPath = _getGarmentActPath(match, GrfStrings.GenderMale, "¼Ò¿ï¸µÄ¿");
+
+				if (actPath == null) {
+					_actGarment = null;
+					_rps.Stop();
+					_rfp.Update();
+					return;
+				}
+
 				var actData = _kro_grf.FileTable.TryGet(actPath);
 
-				if (actData == null)
+				if (actData == null) {
+					_actGarment = null;
+					_rps.Stop();
+					_rfp.Update();
 					return;
+				}
 
-				_selectedMatch = match;
 				_actGarment = new Act(actData, match.SprCompared);
 
 				_fixSprites(_actGarment, match.kROSprite, match.SprCompared);
@@ -279,6 +292,9 @@ namespace ActEditor.Core.WPF.Dialogs {
 
 		public class ActMatch {
 			public string SpriteName { get; set; }
+			public string SpritePath { get; set; }
+			public string GarmentName { get; set; }
+			public bool IsOfficialGarment { get; set; }
 			public double Ratio { get; set; }
 			public Spr SprCompared { get; set; }
 			public Spr kROSprite { get; set; }
@@ -290,12 +306,19 @@ namespace ActEditor.Core.WPF.Dialogs {
 				get { return String.Format("{0:0.00}%", Ratio * 100); }
 			}
 
-			public static ActMatch Match(string spriteName, Spr spr1, Spr spr2) {
+			public string TypeDisplay {
+				get { return IsOfficialGarment ? "Garment" : "Sprite"; }
+			}
+
+			public static ActMatch Match(string spriteName, string spritePath, string garmentName, bool isOfficialGarment, Spr spr1, Spr spr2) {
 				ActMatch match = new ActMatch();
 
 				match.SprCompared = spr1;
 				match.kROSprite = spr2;
 				match.SpriteName = spriteName;
+				match.SpritePath = spritePath;
+				match.GarmentName = garmentName;
+				match.IsOfficialGarment = isOfficialGarment;
 
 				if (Math.Min(9, spr1.NumberOfImagesLoaded) != Math.Min(9, spr2.NumberOfImagesLoaded))
 					return match;
@@ -410,8 +433,8 @@ namespace ActEditor.Core.WPF.Dialogs {
 								string jobname = i == 0 ? garmentPath.Item1 : garmentPath.Item2;
 								string output = GrfPath.Combine(folder, String.Format(@"{0}\{1}\{2}_{3}.act", baseSprite, gender, jobname, gender));
 								GrfPath.CreateDirectoryFromFile(output);
-								string actPath = String.Format(EncodingService.FromAnsiToDisplayEncoding(@"data\sprite\·Îºê\{0}\{1}\{2}_{3}.act"), kROSprite.SpriteName, gender, jobname, gender);
-								var actData = _kro_grf.FileTable.TryGet(actPath);
+								string actPath = _getGarmentActPath(kROSprite, gender, jobname);
+								var actData = actPath == null ? null : _kro_grf.FileTable.TryGet(actPath);
 
 								if (actData == null) {
 									// File not found, make a dummy one
@@ -493,6 +516,7 @@ namespace ActEditor.Core.WPF.Dialogs {
 			if (ActEditorConfiguration.ActEditorGarmentCopySpr) {
 				string tempPath = TemporaryFilesManager.GetTemporaryFilePath(_procId + "_garm_{0:0000}");
 				spr.Save(tempPath);
+				SpriteSaveCompatibility.NormalizePaletteTail(tempPath);
 
 				foreach (var garmentPath in garmentPaths) {
 					for (int i = 0; i < 2; i++) {
@@ -510,6 +534,7 @@ namespace ActEditor.Core.WPF.Dialogs {
 				string output = GrfPath.Combine(folder, String.Format(@"{0}\{0}.spr", baseSprite));
 				GrfPath.CreateDirectoryFromFile(output);
 				spr.Save(output);
+				SpriteSaveCompatibility.NormalizePaletteTail(output);
 			}
 		}
 
@@ -518,16 +543,17 @@ namespace ActEditor.Core.WPF.Dialogs {
 		}
 
 		private List<ActMatch> _findClosestkROSpriteSub(GrfHolder kro_grf, Act act) {
-			HashSet<string> kROsprites = new HashSet<string>();
+			HashSet<string> matchedSpritePaths = new HashSet<string>();
 			List<ActMatch> matches1 = new List<ActMatch>();
 			List<ActMatch> matches2 = new List<ActMatch>();
+			string garmentRoot = EncodingService.FromAnsiToDisplayEncoding(@"data\sprite\·Îºê\");
 
 			Spr spr_source1 = act.Sprite;
 			Spr spr_source2 = new Spr(act.Sprite);
 			spr_source2.Images.ForEach(p => p.Trim());
 
-			foreach (var folder in kro_grf.FileTable.EntriesInDirectory(EncodingService.FromAnsiToDisplayEncoding(@"data\sprite\·Îºê\"), SearchOption.AllDirectories)) {
-				var sprite = folder.RelativePath.Replace(EncodingService.FromAnsiToDisplayEncoding(@"data\sprite\·Îºê\"), "");
+			foreach (var folder in kro_grf.FileTable.EntriesInDirectory(garmentRoot, SearchOption.AllDirectories)) {
+				var sprite = folder.RelativePath.Replace(garmentRoot, "");
 				var dirs = GrfPath.SplitDirectories(sprite);
 
 				if (dirs.Length == 1)
@@ -539,27 +565,54 @@ namespace ActEditor.Core.WPF.Dialogs {
 					continue;
 				}
 
-				if (!kROsprites.Add(baseSprite)) {
+				string sprPath = EncodingService.FromAnsiToDisplayEncoding(String.Format(@"data\sprite\·Îºê\{0}\{0}.spr", baseSprite));
+
+				if (!matchedSpritePaths.Add(sprPath)) {
 					continue;
 				}
 
-				string sprPath = EncodingService.FromAnsiToDisplayEncoding(String.Format(@"data\sprite\·Îºê\{0}\{0}.spr", baseSprite));
+				_addSpriteMatch(kro_grf, matches1, matches2, baseSprite, sprPath, baseSprite, true, spr_source1, spr_source2);
+			}
+
+			foreach (var sprPath in kro_grf.FileTable.Files.Where(p => p.IsExtension(".spr"))) {
+				if (!matchedSpritePaths.Add(sprPath)) {
+					continue;
+				}
+
+				string spriteName = sprPath.StartsWith(garmentRoot) ? sprPath.Replace(garmentRoot, "") : sprPath;
+				spriteName = spriteName.ReplaceExtension("");
+
+				_addSpriteMatch(kro_grf, matches1, matches2, spriteName, sprPath, null, false, spr_source1, spr_source2);
+			}
+
+			return matches1.Concat(matches2).OrderByDescending(p => p.IsOfficialGarment).ThenByDescending(p => p.Ratio).ToList();
+		}
+
+		private void _addSpriteMatch(GrfHolder kro_grf, List<ActMatch> matches1, List<ActMatch> matches2, string spriteName, string sprPath, string garmentName, bool isOfficialGarment, Spr sprSource1, Spr sprSource2) {
+			try {
 				var sprData = kro_grf.FileTable.TryGet(sprPath);
 
 				if (sprData == null)
-					continue;
+					return;
 
 				var spr_kro = new Spr(sprData.GetDecompressedData());
 
-				matches1.Add(ActMatch.Match(baseSprite, spr_source1, spr_kro));
-				matches2.Add(ActMatch.Match(baseSprite, spr_source2, spr_kro));
+				matches1.Add(ActMatch.Match(spriteName, sprPath, garmentName, isOfficialGarment, sprSource1, spr_kro));
+				matches2.Add(ActMatch.Match(spriteName, sprPath, garmentName, isOfficialGarment, sprSource2, spr_kro));
 			}
-
-			return matches1.Concat(matches2).OrderByDescending(p => p.Ratio).ToList();
+			catch {
+			}
 		}
 
 		private ActMatch _findClosestkROSprite(GrfHolder kro_grf, Act act) {
 			return _findClosestkROSpriteSub(kro_grf, act).First();
+		}
+
+		private string _getGarmentActPath(ActMatch match, string gender, string jobname) {
+			if (match == null || !match.IsOfficialGarment || match.GarmentName == null)
+				return null;
+
+			return String.Format(EncodingService.FromAnsiToDisplayEncoding(@"data\sprite\·Îºê\{0}\{1}\{2}_{3}.act"), match.GarmentName, gender, jobname, gender);
 		}
 
 		private void _buttonCancel_Click(object sender, RoutedEventArgs e) {
