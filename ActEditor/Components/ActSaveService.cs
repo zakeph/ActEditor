@@ -4,6 +4,7 @@ using ActEditor.Core.WPF.Dialogs;
 using ErrorManager;
 using GRF.Core;
 using GRF.FileFormats.ActFormat;
+using GRF.FileFormats.SprFormat;
 using GRF.GrfSystem;
 using GRF.Image;
 using GrfToWpfBridge;
@@ -60,6 +61,7 @@ namespace ActEditor.Components {
 			PaletteOnly,
 			SpriteOnly,
 			Gif,
+			AnimatedPng,
 			Image
 		}
 
@@ -80,6 +82,7 @@ namespace ActEditor.Components {
 			new SaveFormat { Name = "Palette files", Filter = "*.pal", Mode = SaveMode.PaletteOnly, RequiredExtension = "*.pal", AnyExtension = "*.pal" },
 			new SaveFormat { Name = "Sprite files", Filter = "*.spr", Mode = SaveMode.SpriteOnly, RequiredExtension = "*.spr", AnyExtension = "*.spr" },
 			new SaveFormat { Name = "Gif files", Filter = "*.gif", Mode = SaveMode.Gif, RequiredExtension = "*.gif", AnyExtension = "*.gif" },
+			new SaveFormat { Name = "Animated PNG files", Filter = "*.png;*.apng", Mode = SaveMode.AnimatedPng, RequiredExtension = "*.png;*.apng", AnyExtension = "*.apng" },
 			new SaveFormat { Name = "Image files", Filter = "*.bmp;*.png;*.jpg;*.tga", Mode = SaveMode.Image, RequiredExtension = "*.bmp;*.png;*.jpg;*.tga", AnyExtension = "*.bmp;*.png;*.jpg;*.tga" },
 		};
 
@@ -141,6 +144,8 @@ namespace ActEditor.Components {
 					return _saveSprOnly(sc);
 				case SaveMode.Gif:
 					return _saveGif(sc);
+				case SaveMode.AnimatedPng:
+					return _saveAnimatedPng(sc);
 				case SaveMode.Image:
 					return _saveImage(sc);
 				default:
@@ -210,6 +215,14 @@ namespace ActEditor.Components {
 		}
 
 		private SaveResult _saveGif(SaveContext sc) {
+			return _saveAnimation(sc, false);
+		}
+
+		private SaveResult _saveAnimatedPng(SaveContext sc) {
+			return _saveAnimation(sc, true);
+		}
+
+		private SaveResult _saveAnimation(SaveContext sc, bool animatedPng) {
 			var act = sc.Tab.Act;
 			var tab = sc.Tab;
 
@@ -217,11 +230,11 @@ namespace ActEditor.Components {
 				act.Sprite.Images[i].Palette[3] = 0;
 			}
 
-			GifSavingDialog dialog = new GifSavingDialog(act, tab.SelectedAction);
+			GifSavingDialog dialog = new GifSavingDialog(act, tab.SelectedAction, animatedPng);
 			dialog.Owner = WpfUtilities.TopWindow;
 
 			if (ActEditorConfiguration.ActEditorGifHideDialog || dialog.ShowDialog() == true) {
-				TaskDialog task = new TaskDialog("Saving as gif...", "app.ico", "Processing frames, please wait...");
+				TaskDialog task = new TaskDialog(animatedPng ? "Saving as animated PNG..." : "Saving as gif...", "app.ico", "Processing frames, please wait...");
 				task.ShowFooter(true);
 				task.Start(isCancelling => {
 					try {
@@ -235,7 +248,14 @@ namespace ActEditor.Components {
 								front.Add(reference.Act);
 						}
 
-						Imaging.SaveAsGif(sc.FilePath, Act.MergeAct(back.ToArray(), act, front.ToArray()), tab.SelectedAction, task, dialog.Dispatch(() => dialog.Extra));
+						var extra = dialog.Dispatch(() => dialog.Extra);
+						bool preservePartialAlpha = animatedPng && GetAnimationOption(extra, "preservePartialAlpha", false);
+						var exportAct = MergeGifActs(back, act, front, preservePartialAlpha);
+						RemoveMissingGifLayers(exportAct);
+						if (animatedPng)
+							ApngEncoder.Save(sc.FilePath, exportAct, tab.SelectedAction, task, extra);
+						else
+							Imaging.SaveAsGif(sc.FilePath, exportAct, tab.SelectedAction, task, extra);
 					}
 					catch (Exception err) {
 						ErrorHandler.HandleException(err);
@@ -245,6 +265,118 @@ namespace ActEditor.Components {
 			}
 
 			return new SaveResult();
+		}
+
+		private static bool GetAnimationOption(string[] extra, string name, bool defaultValue) {
+			for (int i = 0; i + 1 < extra.Length; i += 2) {
+				if (extra[i] == name)
+					return Boolean.Parse(extra[i + 1]);
+			}
+
+			return defaultValue;
+		}
+
+		internal static Act MergeGifActs(IEnumerable<Act> back, Act primary, IEnumerable<Act> front) {
+			return MergeGifActs(back, primary, front, false);
+		}
+
+		internal static Act MergeGifActs(IEnumerable<Act> back, Act primary, IEnumerable<Act> front, bool preservePartialAlpha) {
+			var output = new Act(primary);
+
+			foreach (var reference in back) {
+				output = MergeGifReference(output, reference, false, preservePartialAlpha);
+			}
+
+			foreach (var reference in front) {
+				output = MergeGifReference(output, reference, true, preservePartialAlpha);
+			}
+
+			if (!preservePartialAlpha) {
+				foreach (var image in output.Sprite.Images.Where(image => image.GrfImageType == GrfImageType.Bgra32))
+					RemovePartialGifTransparency(image);
+			}
+
+			return output;
+		}
+
+		private static Act MergeGifReference(Act current, Act reference, bool front, bool preservePartialAlpha) {
+			reference = PrepareGifReference(reference, preservePartialAlpha);
+			int indexedImagesBeforeMerge = current.Sprite.NumberOfIndexed8Images;
+			var layerCounts = current.GetAllFrames().Select(frame => frame.NumberOfLayers).ToList();
+			var merged = front
+				? Act.MergeAct(new Act[0], current, new[] { reference })
+				: Act.MergeAct(new[] { reference }, current, new Act[0]);
+
+			// Act.MergeAct uses the total image count as the BGRA offset. BGRA indexes are
+			// relative to the BGRA section, so remove the indexed-image portion again.
+			int frameIndex = 0;
+			foreach (var frame in merged.GetAllFrames()) {
+				int previousLayerCount = layerCounts[frameIndex++];
+				int addedLayerCount = frame.NumberOfLayers - previousLayerCount;
+				int firstAddedLayer = front ? previousLayerCount : 0;
+
+				for (int i = firstAddedLayer; i < firstAddedLayer + addedLayerCount; i++) {
+					var layer = frame.Layers[i];
+					if (layer.IsBgra32())
+						layer.SpriteIndex -= indexedImagesBeforeMerge;
+				}
+			}
+
+			return merged;
+		}
+
+		private static Act PrepareGifReference(Act reference) {
+			return PrepareGifReference(reference, false);
+		}
+
+		private static Act PrepareGifReference(Act reference, bool preservePartialAlpha) {
+			var prepared = new Act(reference);
+			var bgraIndexes = new Dictionary<int, SpriteIndex>();
+
+			// A SPR has one shared Indexed8 palette. References are rendered with their
+			// own palettes in the editor, so bake those colors into BGRA before merging.
+			for (int i = 0; i < prepared.Sprite.NumberOfIndexed8Images; i++) {
+				var image = prepared.Sprite.GetImage(i, GrfImageType.Indexed8);
+				if (image == null)
+					continue;
+
+				var bgraImage = image.Copy();
+				bgraImage.Convert(GrfImageType.Bgra32);
+				bgraIndexes[i] = prepared.Sprite.InsertAny(bgraImage);
+			}
+
+			foreach (var layer in prepared.GetAllLayers()) {
+				SpriteIndex bgraIndex;
+				if (layer.IsIndexed8() && bgraIndexes.TryGetValue(layer.SpriteIndex, out bgraIndex)) {
+					layer.SprSpriteIndex = bgraIndex;
+				}
+			}
+
+			if (!preservePartialAlpha) {
+				foreach (var image in prepared.Sprite.Images.Where(image => image.GrfImageType == GrfImageType.Bgra32)) {
+					RemovePartialGifTransparency(image);
+				}
+			}
+
+			return prepared;
+		}
+
+		internal static void RemovePartialGifTransparency(GrfImage image) {
+			// GIF cannot represent partial alpha. Dropping those pixels avoids both
+			// a white matte and the visible dot pattern produced by dithering.
+			for (int alphaIndex = 3; alphaIndex < image.Pixels.Length; alphaIndex += 4) {
+				byte alpha = image.Pixels[alphaIndex];
+				if (alpha != 0 && alpha != 255)
+					image.Pixels[alphaIndex] = 0;
+			}
+		}
+
+		internal static void RemoveMissingGifLayers(Act exportAct) {
+			// Match the viewport: layers without a sprite image are not drawable.
+			// Only modify the merged export copy; retain empty frames and their timing.
+			foreach (var frame in exportAct.GetAllFrames()) {
+				frame.Layers.RemoveAll(layer => layer == null || exportAct.Sprite.GetImage(layer) == null);
+			}
 		}
 
 		private SaveResult _saveImage(SaveContext sc) {

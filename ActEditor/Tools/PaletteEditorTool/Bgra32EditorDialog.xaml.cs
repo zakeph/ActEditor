@@ -14,25 +14,36 @@ namespace ActEditor.Tools.PaletteEditorTool {
 	public partial class Bgra32EditorDialog : Window {
 		private readonly Spr _targetSprite;
 		private readonly Spr _originalSprite;
-		private readonly List<int> _allBgra32Indexes;
-		private readonly List<int> _selectedBgra32Indexes;
+		private readonly ToneEditorMode _mode;
+		private readonly List<int> _allImageIndexes;
+		private readonly List<int> _selectedImageIndexes;
+		private readonly List<int> _allPaletteIndexes;
+		private readonly List<int> _selectedPaletteIndexes;
 		private bool _isUpdating;
 		private bool _accepted;
 
-		public Bgra32EditorDialog(Spr targetSprite, IEnumerable<int> selectedBgra32Indexes) {
+		public Bgra32EditorDialog(Spr targetSprite, IEnumerable<int> selectedImageIndexes, ToneEditorMode mode = ToneEditorMode.Bgra32) {
 			InitializeComponent();
 
 			_targetSprite = targetSprite;
 			_originalSprite = new Spr(targetSprite);
-			_allBgra32Indexes = Enumerable.Range(0, targetSprite.Images.Count)
-				.Where(p => targetSprite.Images[p].GrfImageType == GrfImageType.Bgra32)
+			_mode = mode;
+			GrfImageType imageType = mode == ToneEditorMode.Bgra32 ? GrfImageType.Bgra32 : GrfImageType.Indexed8;
+			_allImageIndexes = Enumerable.Range(0, targetSprite.Images.Count)
+				.Where(p => targetSprite.Images[p].GrfImageType == imageType)
 				.ToList();
-			_selectedBgra32Indexes = selectedBgra32Indexes == null
+			_selectedImageIndexes = selectedImageIndexes == null
 				? new List<int>()
-				: selectedBgra32Indexes.Where(p => _allBgra32Indexes.Contains(p)).Distinct().OrderBy(p => p).ToList();
+				: selectedImageIndexes.Where(p => _allImageIndexes.Contains(p)).Distinct().OrderBy(p => p).ToList();
+			_allPaletteIndexes = _getUsedPaletteIndexes(_allImageIndexes);
+			_selectedPaletteIndexes = _getUsedPaletteIndexes(_selectedImageIndexes);
 
-			_cbSelectedOnly.IsEnabled = _selectedBgra32Indexes.Count > 0;
-			_cbSelectedOnly.IsChecked = _selectedBgra32Indexes.Count > 0;
+			_cbSelectedOnly.IsEnabled = _selectedImageIndexes.Count > 0;
+			_cbSelectedOnly.IsChecked = _selectedImageIndexes.Count > 0;
+			if (_mode == ToneEditorMode.Indexed8) {
+				Title = "Indexed8 editor";
+				_cbSelectedOnly.Content = "Colors used by selected layers only";
+			}
 			_targetColor.Color = Colors.LimeGreen;
 
 			_updateLabels();
@@ -48,9 +59,28 @@ namespace ActEditor.Tools.PaletteEditorTool {
 
 		private IEnumerable<int> _getTargetIndexes() {
 			if (_cbSelectedOnly.IsEnabled && _cbSelectedOnly.IsChecked == true)
-				return _selectedBgra32Indexes;
+				return _selectedImageIndexes;
 
-			return _allBgra32Indexes;
+			return _allImageIndexes;
+		}
+
+		private IEnumerable<int> _getTargetPaletteIndexes() {
+			if (_cbSelectedOnly.IsEnabled && _cbSelectedOnly.IsChecked == true)
+				return _selectedPaletteIndexes;
+
+			return _allPaletteIndexes;
+		}
+
+		private List<int> _getUsedPaletteIndexes(IEnumerable<int> imageIndexes) {
+			if (_mode != ToneEditorMode.Indexed8)
+				return new List<int>();
+
+			return imageIndexes
+				.SelectMany(index => _originalSprite.Images[index].Pixels.Select(pixel => (int)pixel))
+				.Where(index => index != 0)
+				.Distinct()
+				.OrderBy(index => index)
+				.ToList();
 		}
 
 		private void _control_ValueChanged(object sender, RoutedEventArgs e) {
@@ -73,7 +103,7 @@ namespace ActEditor.Tools.PaletteEditorTool {
 			_sliderLightness.Value = 0;
 			_sliderBrightness.Value = 0;
 			_sliderContrast.Value = 0;
-			_sliderTolerance.Value = 20;
+			_sliderTolerance.Value = 45;
 			_sliderMinimumSaturation.Value = 10;
 			_cbTargetColor.IsChecked = false;
 			_targetColor.Color = Colors.LimeGreen;
@@ -97,6 +127,9 @@ namespace ActEditor.Tools.PaletteEditorTool {
 			for (int i = 0; i < _targetSprite.Images.Count; i++) {
 				_targetSprite.Images[i] = _originalSprite.Images[i].Copy();
 			}
+
+			if (_targetSprite.Palette != null && _originalSprite.Palette != null)
+				_targetSprite.Palette.SetPalette(_originalSprite.Palette.BytePalette);
 		}
 
 		private void _applyPreview() {
@@ -113,13 +146,21 @@ namespace ActEditor.Tools.PaletteEditorTool {
 				MinimumSaturation = _sliderMinimumSaturation.Value / 100d
 			};
 
-			foreach (int index in _getTargetIndexes()) {
-				ApplyTone(previewSprite.Images[index], options);
+			if (_mode == ToneEditorMode.Bgra32) {
+				foreach (int index in _getTargetIndexes()) {
+					ApplyTone(previewSprite.Images[index], options);
+				}
+			}
+			else if (previewSprite.Palette != null) {
+				ApplyToneToPalette(previewSprite.Palette.BytePalette, _getTargetPaletteIndexes(), options);
 			}
 
 			for (int i = 0; i < _targetSprite.Images.Count; i++) {
 				_targetSprite.Images[i] = previewSprite.Images[i];
 			}
+
+			if (_mode == ToneEditorMode.Indexed8 && _targetSprite.Palette != null && previewSprite.Palette != null)
+				_targetSprite.Palette.SetPalette(previewSprite.Palette.BytePalette);
 
 			if (_targetSprite.Palette != null)
 				_targetSprite.Palette.OnPaletteChanged();
@@ -189,6 +230,25 @@ namespace ActEditor.Tools.PaletteEditorTool {
 				pixels[i + 1] = (byte)Math.Round(g * 255d);
 				pixels[i + 2] = (byte)Math.Round(r * 255d);
 				pixels[i + 3] = alpha;
+			}
+		}
+
+		public static void ApplyToneToPalette(byte[] palette, IEnumerable<int> paletteIndexes, ToneOptions options) {
+			if (palette == null || paletteIndexes == null)
+				return;
+
+			foreach (int paletteIndex in paletteIndexes) {
+				int offset = paletteIndex * 4;
+
+				if (offset < 0 || offset + 3 >= palette.Length || palette[offset + 3] == 0)
+					continue;
+
+				// Indexed8 palettes are RGBA while Bgra32 pixels are BGRA.
+				var pixel = new GrfImage(new[] { palette[offset + 2], palette[offset + 1], palette[offset], palette[offset + 3] }, 1, 1, GrfImageType.Bgra32);
+				ApplyTone(pixel, options);
+				palette[offset] = pixel.Pixels[2];
+				palette[offset + 1] = pixel.Pixels[1];
+				palette[offset + 2] = pixel.Pixels[0];
 			}
 		}
 
@@ -273,6 +333,11 @@ namespace ActEditor.Tools.PaletteEditorTool {
 
 			return value;
 		}
+	}
+
+	public enum ToneEditorMode {
+		Bgra32,
+		Indexed8
 	}
 
 	public class ToneOptions {

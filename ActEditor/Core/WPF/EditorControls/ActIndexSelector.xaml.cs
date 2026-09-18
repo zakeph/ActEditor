@@ -33,6 +33,8 @@ namespace ActEditor.Core.WPF.EditorControls {
 		private readonly SoundEffect _se = new SoundEffect();
 		private IFrameRendererEditor _editor;
 		private bool _firstInitDone;
+		private int _frameBeforePreview;
+		private bool _isPreviewing;
 
 		public ActIndexSelector() {
 			InitializeComponent();
@@ -49,6 +51,8 @@ namespace ActEditor.Core.WPF.EditorControls {
 			((Grid)((Grid)((Border)_buttonRenderMode.FindName("_border")).Child).Children[2]).Margin = new Thickness(2, 0, 0, 0);
 
 			ActIndexSelectorHelper.UpdatePlayButtonUI(_play);
+			_preview.TextHeader = "Preview";
+			_preview.ToolTip = "Show the final pose of the selected action without advancing its frames.";
 
 			_buttonRenderMode.Click += delegate {
 				ActEditorConfiguration.ActEditorScalingMode.Set(ActEditorConfiguration.ActEditorScalingMode.Get() == BitmapScalingMode.NearestNeighbor ? BitmapScalingMode.Fant : BitmapScalingMode.NearestNeighbor);
@@ -139,6 +143,51 @@ namespace ActEditor.Core.WPF.EditorControls {
 				Play();
 		}
 
+		private void _preview_Click(object sender, RoutedEventArgs e) {
+			if (_isPreviewing) {
+				_exitPreview(true);
+			}
+			else {
+				_enterPreview();
+			}
+		}
+
+		private void _enterPreview() {
+			if (_editor == null || _editor.Act == null)
+				return;
+
+			Stop();
+			_frameBeforePreview = SelectedFrame;
+			_isPreviewing = true;
+			_preview.IsPressed = true;
+			_sbFrameIndex.SetEnabled(false);
+			_applyPreviewFrame();
+		}
+
+		private void _exitPreview(bool restoreFrame) {
+			if (!_isPreviewing)
+				return;
+
+			_isPreviewing = false;
+			_preview.IsPressed = false;
+			_sbFrameIndex.SetEnabled(true);
+
+			if (restoreFrame && _editor != null && _editor.Act != null && _editor.Act[SelectedAction].NumberOfFrames > 0)
+				SelectedFrame = Math.Min(_frameBeforePreview, _editor.Act[SelectedAction].NumberOfFrames - 1);
+		}
+
+		private void _applyPreviewFrame() {
+			if (!_isPreviewing || _editor == null || _editor.Act == null || SelectedAction >= _editor.Act.NumberOfActions)
+				return;
+
+			int frameCount = _editor.Act[SelectedAction].NumberOfFrames;
+			if (frameCount > 0) {
+				// Transition actions such as Sitting settle on their final frame.
+				SelectedFrame = frameCount - 1;
+				_editor.FrameRenderer.Update();
+			}
+		}
+
 		public void PlaySound(string soundFile) {
 			if (soundFile != null && ActEditorConfiguration.ActEditorPlaySound) {
 				if (soundFile.GetExtension() == null)
@@ -184,6 +233,7 @@ namespace ActEditor.Core.WPF.EditorControls {
 		}
 
 		private void _actEditor_ActLoaded(object sender) {
+			_exitPreview(false);
 			ActionChanged -= _actIndexSelector_ActionChanged;
 			ActionChanged += _actIndexSelector_ActionChanged;
 			_directionalControl.Init(this, _editor);
@@ -196,6 +246,7 @@ namespace ActEditor.Core.WPF.EditorControls {
 
 		private void _actIndexSelector_ActionChanged(int index) {
 			_updateInterval();
+			_applyPreviewFrame();
 		}
 
 		private void _commands_CommandUndo(object sender, IActCommand command) {
@@ -211,6 +262,7 @@ namespace ActEditor.Core.WPF.EditorControls {
 
 		public void Play() {
 			if (IsPlaying) return;
+			_exitPreview(true);
 
 			_play.Dispatch(delegate {
 				_play.IsPressed = true;

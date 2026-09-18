@@ -20,8 +20,10 @@ namespace ActEditor.Core.WPF.Dialogs {
 			InitializeComponent();
 		}
 
-		public GifSavingDialog(Act act, int selectedIndex) : base("Gif saving", "app.ico") {
+		public GifSavingDialog(Act act, int selectedIndex, bool animatedPng = false) : base(animatedPng ? "Animated PNG saving" : "Gif saving", "app.ico") {
 			InitializeComponent();
+			_cbPreservePartialAlpha.Visibility = animatedPng ? Visibility.Visible : Visibility.Collapsed;
+			_cbPreservePartialAlpha.IsChecked = false;
 
 			if (act == null) {
 				Loaded += delegate {
@@ -76,6 +78,9 @@ namespace ActEditor.Core.WPF.Dialogs {
 
 				_extra.Add("margin");
 				_extra.Add(ActEditorConfiguration.ActEditorGifMargin.ToString(CultureInfo.InvariantCulture));
+
+				_extra.Add("preservePartialAlpha");
+				_extra.Add((_cbPreservePartialAlpha.IsChecked == true).ToString());
 
 				return _extra.ToArray();
 			}

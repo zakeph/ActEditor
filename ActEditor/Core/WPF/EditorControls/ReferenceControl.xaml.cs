@@ -10,8 +10,11 @@ using ActEditor.ApplicationConfiguration;
 using ActEditor.Core.WPF.Dialogs;
 using ActEditor.Core.WPF.EditorControls.ActSelectorComponents;
 using ActEditor.Tools.GrfShellExplorer;
+using ActEditor.Tools.PaletteSheetGenerator;
 using ErrorManager;
+using GRF;
 using GRF.FileFormats.ActFormat;
+using GRF.FileFormats.PalFormat;
 using GRF.FileFormats.SprFormat;
 using GRF.IO;
 using GrfToWpfBridge;
@@ -21,6 +24,7 @@ using TokeiLibrary.Paths;
 using TokeiLibrary.WPF;
 using Utilities;
 using Utilities.Extension;
+using Utilities.Services;
 
 namespace ActEditor.Core.WPF.EditorControls {
 	/// <summary>
@@ -40,6 +44,8 @@ namespace ActEditor.Core.WPF.EditorControls {
 		private LayerControl _layerControl;
 		private readonly string _name;
 		private string _filePath;
+		private string _resourceActPath;
+		private bool _initializingPalette;
 		private ZMode _mode;
 		private bool _sex;
 		private bool _directional;
@@ -64,6 +70,7 @@ namespace ActEditor.Core.WPF.EditorControls {
 			_mode = Int32.Parse(ActEditorConfiguration.ConfigAsker["[ActEditor - Mode - " + name + "]", "0"]) == 0 ? ZMode.Front : ZMode.Back;
 			_sex = Boolean.Parse(ActEditorConfiguration.ConfigAsker["[ActEditor - Gender - " + name + "]", "true"]);
 			_filePath = ActEditorConfiguration.ConfigAsker["[ActEditor - Path - " + name + "]", ""];
+			_resourceActPath = ActEditorConfiguration.ConfigAsker["[ActEditor - Resource path - " + name + "]", ""];
 
 			InitializeComponent();
 
@@ -72,6 +79,13 @@ namespace ActEditor.Core.WPF.EditorControls {
 			}
 
 			InitializeLayerAndHeaderComponent();
+
+			// Restore the palette before the enabled-state binder creates the ACT/SPR.
+			// Otherwise the saved ID is visible after startup, but the sprite keeps its
+			// default palette until the user changes the combo box manually.
+			if (name == "Head" || name == "Body") {
+				InitializePaletteComponent();
+			}
 
 			// Must be executed last because if enabled, it will read the properties above
 			InitializeReferenceConfigComponents();
@@ -82,7 +96,7 @@ namespace ActEditor.Core.WPF.EditorControls {
 
 			_referenceFrame_FilePathChanged(null);
 
-			if (name == "Head" || name == "Other" || name == "Body") {
+			if (name == "Head" || name == "Other" || name == "Garment" || name == "Body") {
 				_buttonAnchor.Visibility = Visibility.Visible;
 				_buttonAnchor.IsEnabled = true;
 
@@ -90,8 +104,25 @@ namespace ActEditor.Core.WPF.EditorControls {
 				_cbAnchor.IsEnabled = true;
 			}
 
+			if (name == "Head" || name == "Body") {
+				_buttonChange.Visibility = Visibility.Visible;
+			}
+
 			InitializeAnchorComponent();
 			InitializeSpriteRetrieveComponent();
+		}
+
+		private void InitializePaletteComponent() {
+			_initializingPalette = true;
+			_palettePanel.Visibility = Visibility.Visible;
+			_paletteId.ItemsSource = Enumerable.Range(0, 956);
+
+			int paletteId;
+			if (!Int32.TryParse(ActEditorConfiguration.ConfigAsker["[ActEditor - Palette - " + _name + "]", "0"], out paletteId))
+				paletteId = 0;
+
+			_paletteId.SelectedItem = Math.Max(0, Math.Min(955, paletteId));
+			_initializingPalette = false;
 		}
 
 		private void InitializeSpriteRetrieveComponent() {
@@ -223,7 +254,7 @@ namespace ActEditor.Core.WPF.EditorControls {
 				return;
 			}
 
-			if (!String.IsNullOrEmpty(_filePath)) {
+			if (!String.IsNullOrEmpty(_filePath) || !String.IsNullOrEmpty(_resourceActPath)) {
 				_gender.Visibility = Visibility.Collapsed;
 			}
 			else {	
@@ -263,6 +294,8 @@ namespace ActEditor.Core.WPF.EditorControls {
 		public string FilePath {
 			get { return _filePath; }
 			set {
+				_resourceActPath = null;
+				ActEditorConfiguration.ConfigAsker["[ActEditor - Resource path - " + _name + "]"] = "";
 				_filePath = value;
 				ActEditorConfiguration.ConfigAsker["[ActEditor - Path - " + _name + "]"] = value;
 				OnFilePathChanged();
@@ -285,7 +318,7 @@ namespace ActEditor.Core.WPF.EditorControls {
 		}
 
 		public void Init() {
-			if (_name == "Head" || _name == "Other" || _name == "Body") {
+			if (_name == "Head" || _name == "Other" || _name == "Garment" || _name == "Body") {
 				if (_name == "Body")
 					_cbAnchor.SelectedIndex = 3;
 
@@ -394,10 +427,11 @@ namespace ActEditor.Core.WPF.EditorControls {
 		}
 
 		private void _referenceFrame_FilePathChanged(object sender) {
-			_reset.Visibility = String.IsNullOrEmpty(FilePath) ? Visibility.Hidden : Visibility.Visible;
+			bool usesCustomSprite = !String.IsNullOrEmpty(FilePath) || !String.IsNullOrEmpty(_resourceActPath);
+			_reset.Visibility = usesCustomSprite ? Visibility.Visible : Visibility.Hidden;
 
 			if (!_directional)
-				_gender.Visibility = String.IsNullOrEmpty(FilePath) ? Visibility.Visible : Visibility.Hidden;
+				_gender.Visibility = usesCustomSprite ? Visibility.Collapsed : Visibility.Visible;
 		}
 
 		private void _buttonSprite_Click(object sender) {
@@ -428,6 +462,27 @@ namespace ActEditor.Core.WPF.EditorControls {
 			}
 		}
 
+		private void _buttonChange_Click(object sender) {
+			try {
+				var dialog = new SpriteReferenceSelectorDialog(_name, _sex, _actEditor.ActEditor.MetaGrf) { Owner = Window.GetWindow(this) };
+
+				if (dialog.ShowDialog() == true) {
+					_sex = dialog.SelectedFemale;
+					ActEditorConfiguration.ConfigAsker["[ActEditor - Gender - " + _name + "]"] = _sex.ToString();
+					_resourceActPath = dialog.SelectedRelativeActPath;
+					ActEditorConfiguration.ConfigAsker["[ActEditor - Resource path - " + _name + "]"] = _resourceActPath;
+					_filePath = dialog.SelectedContainerPath + "?" + _resourceActPath;
+					ActEditorConfiguration.ConfigAsker["[ActEditor - Path - " + _name + "]"] = _filePath;
+					OnFilePathChanged();
+					_updateGenderButton();
+					Update(true);
+				}
+			}
+			catch (Exception err) {
+				ErrorHandler.HandleException(err);
+			}
+		}
+
 		private void _reset_Click(object sender, RoutedEventArgs e) {
 			try {
 				FilePath = null;
@@ -435,6 +490,14 @@ namespace ActEditor.Core.WPF.EditorControls {
 			catch (Exception err) {
 				ErrorHandler.HandleException(err);
 			}
+		}
+
+		private void _paletteId_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+			if (_initializingPalette || _paletteId.SelectedItem == null)
+				return;
+
+			ActEditorConfiguration.ConfigAsker["[ActEditor - Palette - " + _name + "]"] = ((int)_paletteId.SelectedItem).ToString();
+			Update(true);
 		}
 
 		private void _fancyButton_Click(object sender, RoutedEventArgs e) {
@@ -487,6 +550,16 @@ namespace ActEditor.Core.WPF.EditorControls {
 			byte[] dataAct = ApplicationManager.GetResource((_sex ? _defaultFemale : _defaultMale) + ".act");
 			byte[] dataSpr = ApplicationManager.GetResource((_sex ? _defaultFemale : _defaultMale) + ".spr");
 
+			if (!String.IsNullOrEmpty(_resourceActPath)) {
+				byte[] resourceAct = _actEditor.ActEditor.MetaGrf.GetData(_resourceActPath);
+				byte[] resourceSpr = _actEditor.ActEditor.MetaGrf.GetData(_resourceActPath.ReplaceExtension(".spr"));
+
+				if (resourceAct != null && resourceSpr != null) {
+					dataAct = resourceAct;
+					dataSpr = resourceSpr;
+				}
+			}
+
 			if (FilePath != null && FilePath.IsExtension(".spr", ".act")) {
 				TkPath path = FilePath;
 
@@ -513,7 +586,60 @@ namespace ActEditor.Core.WPF.EditorControls {
 			}
 
 			Spr = new Spr(dataSpr);
+			ApplySelectedPalette(Spr);
 			Act = new Act(dataAct, Spr);
+		}
+
+		private void ApplySelectedPalette(Spr sprite) {
+			if ((_name != "Head" && _name != "Body") || _paletteId.SelectedItem == null || String.IsNullOrEmpty(_resourceActPath))
+				return;
+
+			int paletteId = (int)_paletteId.SelectedItem;
+			string gender = _sex ? GrfStrings.GenderFemale : GrfStrings.GenderMale;
+			string fileName = Path.GetFileNameWithoutExtension(_resourceActPath);
+			string genderSuffix = "_" + gender;
+			int genderIndex = fileName.LastIndexOf(genderSuffix, StringComparison.OrdinalIgnoreCase);
+
+			if (genderIndex >= 0)
+				fileName = fileName.Remove(genderIndex) + fileName.Substring(genderIndex + genderSuffix.Length);
+
+			var paths = new List<string>();
+
+			if (_name == "Head") {
+				string headId = fileName.Split('_')[0];
+				paths.Add(String.Format(@"data\palette\¸Ó¸®\¸Ó¸®{0}_{1}_{2}.pal", headId, gender, paletteId));
+			}
+			else {
+				string spriteName = fileName;
+				while (spriteName.EndsWith("_1", StringComparison.OrdinalIgnoreCase) || spriteName.EndsWith("_2", StringComparison.OrdinalIgnoreCase))
+					spriteName = spriteName.Substring(0, spriteName.Length - 2);
+
+				string paletteName = spriteName;
+				try {
+					var bodyResource = new BodySpritesLoader().Load().Resources.Values.FirstOrDefault(value => String.Equals(value.Sprite, spriteName, StringComparison.OrdinalIgnoreCase));
+					if (bodyResource != null && !String.IsNullOrEmpty(bodyResource.Palette))
+						paletteName = bodyResource.Palette;
+				}
+				catch {
+				}
+
+				paths.Add(String.Format(@"data\palette\¸ö\{0}_{1}_{2}.pal", paletteName, gender, paletteId));
+				paths.Add(String.Format(@"data\palette\¸ö\{0}_{1}.pal", paletteName, paletteId));
+			}
+
+			byte[] palette = null;
+			foreach (string path in paths) {
+				palette = _actEditor.ActEditor.MetaGrf.GetData(EncodingService.FromAnyToDisplayEncoding(path)) ?? _actEditor.ActEditor.MetaGrf.GetData(path);
+				if (palette != null)
+					break;
+			}
+
+			if (palette == null)
+				return;
+
+			// Ragnarok palettes do not store a usable alpha channel.  Applying the
+			// raw bytes makes every indexed colour transparent in the renderer.
+			sprite.Palette = new Pal(palette, Pal.FormatMode.NoTransparencyExceptFirstPixel);
 		}
 	}
 }

@@ -37,7 +37,7 @@
 		                                    HorizontalAlignment="Left" ColorChanged="_targetColor_ColorChanged" />
 
 		<Label Grid.Row="3" Grid.Column="0" Content="Hue tolerance" Padding="0" VerticalAlignment="Center" />
-		<Slider Grid.Row="3" Grid.Column="1" x:Name="_sliderTolerance" Minimum="0" Maximum="90" TickFrequency="5" Value="20" ValueChanged="_control_ValueChanged" />
+		<Slider Grid.Row="3" Grid.Column="1" x:Name="_sliderTolerance" Minimum="0" Maximum="90" TickFrequency="5" Value="45" ValueChanged="_control_ValueChanged" />
 		<TextBlock Grid.Row="3" Grid.Column="2" x:Name="_tbTolerance" Margin="8 0 0 0" VerticalAlignment="Center" />
 
 		<Label Grid.Row="4" Grid.Column="0" Content="Min. saturation" Padding="0" VerticalAlignment="Center" />

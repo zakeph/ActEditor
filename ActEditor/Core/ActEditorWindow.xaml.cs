@@ -115,6 +115,9 @@ namespace ActEditor.Core {
 		}
 
 		private void _initializeMetaGrf() {
+			_addBundledResource("jobs.grf");
+			_addBundledResource("palettes.grf");
+
 			_metaGrfViewer.SaveResourceMethod = delegate (string resources) {
 				ActEditorConfiguration.Resources = Methods.StringToList(resources);
 				_metaGrfViewer.LoadResourcesInfo();
@@ -130,6 +133,24 @@ namespace ActEditor.Core {
 				catch {
 				}
 			}, "ActEditor - MetaGrf loader");
+		}
+
+		private static void _addBundledResource(string fileName) {
+			string path = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", fileName);
+
+			if (!File.Exists(path)) {
+				path = Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "Resources", fileName));
+			}
+
+			if (!File.Exists(path))
+				return;
+
+			var resources = ActEditorConfiguration.Resources;
+			if (resources.Any(resource => String.Equals(resource, path, StringComparison.OrdinalIgnoreCase)))
+				return;
+
+			resources.Insert(0, path);
+			ActEditorConfiguration.Resources = resources;
 		}
 
 		private void _initializeShortcuts() {
@@ -243,6 +264,7 @@ namespace ActEditor.Core {
 		private void _initializeMenu() {
 			_splashWindow.Display = "Loading Act Editor's scripts...";
 			_scriptLoader.AddScriptsToMenu(new SpriteExportNormal(), this, _mainMenu);
+			_scriptLoader.AddScriptsToMenu(new ItemSpriteExport(), this, _mainMenu);
 			_scriptLoader.AddScriptsToMenu(new SpriteExport(), this, _mainMenu);
 			
 			_scriptLoader.AddScriptsToMenu(new EditSelectAll(), this, _mainMenu);
@@ -260,6 +282,7 @@ namespace ActEditor.Core {
 			_scriptLoader.AddScriptsToMenu(new EditPalette(), this, _mainMenu);
 			_scriptLoader.AddScriptsToMenu(new EditPaletteAdvanced(), this, _mainMenu);
 			_scriptLoader.AddScriptsToMenu(new EditBgra32Tones(), this, _mainMenu);
+			_scriptLoader.AddScriptsToMenu(new EditIndexed8Tones(), this, _mainMenu);
 			_scriptLoader.AddScriptsToMenu(new ImportPaletteFrom(), this, _mainMenu);
 			
 			_scriptLoader.AddScriptsToMenu(new EditAnchor(), this, _mainMenu);

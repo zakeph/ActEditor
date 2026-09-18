@@ -80,7 +80,10 @@
             <TextBox Name="_tbIndexTo" Grid.Row="1" Grid.Column="1" Margin="3" />
             <CheckBox Name="_cbUniform" Grid.Row="2" Grid.Column="1" Margin="3" VerticalAlignment="Center" HorizontalAlignment="Center" />
             <GenericControls:QuickColorSelector x:Name="_colorBackground" Grid.Row="3" Grid.Column="1" Margin="3" />
-			<GenericControls:QuickColorSelector x:Name="_colorGuildelines" Grid.Row="4" Grid.Column="1" Margin="3" />
+            <GenericControls:QuickColorSelector x:Name="_colorGuildelines" Grid.Row="4" Grid.Column="1" Margin="3" />
+            <CheckBox Name="_cbPreservePartialAlpha" Grid.Row="5" Grid.ColumnSpan="2" Margin="3"
+                      Content="Preserve partial BGRA transparency (smoother, less vivid)"
+                      Visibility="Collapsed" />
             <TextBox Name="_tbDelay" Grid.Row="6" Grid.Column="1" Margin="3" />
             <TextBox Name="_tbDelayFactor" Grid.Row="7" Grid.Column="1" Margin="3" />
             <TextBox Name="_tbMargin" Grid.Row="8" Grid.Column="1" Margin="3" />

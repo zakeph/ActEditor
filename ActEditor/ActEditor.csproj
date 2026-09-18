@@ -169,6 +169,7 @@
       <DependentUpon>ActEditorWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Components\ActSaveService.cs" />
+    <Compile Include="Components\ApngEncoder.cs" />
     <Compile Include="Core\ActHelper.cs" />
     <Compile Include="Core\SpriteSaveCompatibility.cs" />
     <Compile Include="Core\DrawingComponents\GridRenderer.cs" />
@@ -218,6 +219,7 @@
       <DependentUpon>ActionEditDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Core\WPF\Dialogs\HeadEditorActIndexSelector.cs" />
+    <Compile Include="Core\WPF\Dialogs\SpriteReferenceSelectorDialog.cs" />
     <Compile Include="Core\WPF\Dialogs\ScriptErrorDialog.xaml.cs">
       <DependentUpon>ScriptErrorDialog.xaml</DependentUpon>
     </Compile>
@@ -789,6 +791,14 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\export.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\jobs.grf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\palettes.grf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\splash.png" />

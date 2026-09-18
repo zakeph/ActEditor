@@ -104,7 +104,10 @@
                     </Styles:FancyButton.ToolTip>
                 </Styles:FancyButton>
 				<actselectorcomponents:SoundSelector x:Name="_cbSound" VerticalAlignment="Center" Grid.Row="2" Grid.Column="3" Margin="3" Width="100" />
-				<Styles:FancyButton VerticalAlignment="Center" Grid.Row="1" Grid.Column="1" x:Name="_play" Height="20" Margin="2" Click="_play_Click" />
+				<StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+					<Styles:FancyButton x:Name="_play" Height="20" Margin="2" Click="_play_Click" />
+					<Styles:FancyButton x:Name="_preview" Height="20" MinWidth="62" Margin="2" Click="_preview_Click" />
+				</StackPanel>
                 <Grid Grid.Row="1" Grid.Column="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />

@@ -574,17 +574,6 @@ namespace ActEditor.Core.WPF.Dialogs {
 				_addSpriteMatch(kro_grf, matches1, matches2, baseSprite, sprPath, baseSprite, true, spr_source1, spr_source2);
 			}
 
-			foreach (var sprPath in kro_grf.FileTable.Files.Where(p => p.IsExtension(".spr"))) {
-				if (!matchedSpritePaths.Add(sprPath)) {
-					continue;
-				}
-
-				string spriteName = sprPath.StartsWith(garmentRoot) ? sprPath.Replace(garmentRoot, "") : sprPath;
-				spriteName = spriteName.ReplaceExtension("");
-
-				_addSpriteMatch(kro_grf, matches1, matches2, spriteName, sprPath, null, false, spr_source1, spr_source2);
-			}
-
 			return matches1.Concat(matches2).OrderByDescending(p => p.IsOfficialGarment).ThenByDescending(p => p.Ratio).ToList();
 		}
 
