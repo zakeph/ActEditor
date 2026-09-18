@@ -793,6 +793,9 @@
     <Resource Include="Resources\export.png" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Resources\Nielily_collection.png" />
+  </ItemGroup>
+  <ItemGroup>
     <Content Include="Resources\jobs.grf">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

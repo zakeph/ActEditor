@@ -46,6 +46,7 @@ namespace ActEditor.Core.WPF.EditorControls {
 		private string _filePath;
 		private string _resourceActPath;
 		private bool _initializingPalette;
+		private bool _initializingStyle;
 		private ZMode _mode;
 		private bool _sex;
 		private bool _directional;
@@ -87,6 +88,10 @@ namespace ActEditor.Core.WPF.EditorControls {
 				InitializePaletteComponent();
 			}
 
+			if (name == "Head") {
+				InitializeStyleComponent();
+			}
+
 			// Must be executed last because if enabled, it will read the properties above
 			InitializeReferenceConfigComponents();
 
@@ -104,7 +109,7 @@ namespace ActEditor.Core.WPF.EditorControls {
 				_cbAnchor.IsEnabled = true;
 			}
 
-			if (name == "Head" || name == "Body") {
+			if (name == "Body") {
 				_buttonChange.Visibility = Visibility.Visible;
 			}
 
@@ -123,6 +128,53 @@ namespace ActEditor.Core.WPF.EditorControls {
 
 			_paletteId.SelectedItem = Math.Max(0, Math.Min(955, paletteId));
 			_initializingPalette = false;
+		}
+
+		private void InitializeStyleComponent() {
+			_stylePanel.Visibility = Visibility.Visible;
+			ReloadStyleChoices();
+		}
+
+		private void ReloadStyleChoices() {
+			_initializingStyle = true;
+			try {
+				string genderFolder = _sex ? "¿©" : "³²";
+				string folder = @"data\sprite\ÀÎ°£Á·\¸Ó¸®Åë\" + genderFolder + @"\";
+				string encodedFolder = EncodingService.FromAnyToDisplayEncoding(folder);
+				var paths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+				foreach (var container in _actEditor.ActEditor.MetaGrf.Containers.Values) {
+					foreach (var entry in container.FileTable.EntriesInDirectory(encodedFolder, SearchOption.AllDirectories)) {
+						string path = entry.RelativePath;
+						if (path.IsExtension(".act") && _actEditor.ActEditor.MetaGrf.Exists(path.ReplaceExtension(".spr")))
+							paths.Add(path);
+					}
+				}
+
+				var choices = paths.Select(path => new HeadStyleChoice(path, GetHeadStyleName(path, genderFolder)))
+					.OrderBy(choice => choice.SortId)
+					.ThenBy(choice => choice.DisplayName, StringComparer.OrdinalIgnoreCase)
+					.ToList();
+				choices.Insert(0, new HeadStyleChoice(null, "Default hairstyle"));
+				_styleId.ItemsSource = choices;
+				_styleId.SelectedItem = choices.FirstOrDefault(choice => String.Equals(choice.ActPath, _resourceActPath, StringComparison.OrdinalIgnoreCase));
+				if (_styleId.SelectedItem == null && choices.Count > 0)
+					_styleId.SelectedIndex = 0;
+			}
+			finally {
+				_initializingStyle = false;
+			}
+		}
+
+		private static string GetHeadStyleName(string path, string genderFolder) {
+			string name = Path.GetFileNameWithoutExtension(path);
+			string suffix = "_" + genderFolder;
+			int suffixIndex = name.LastIndexOf(suffix, StringComparison.OrdinalIgnoreCase);
+			if (suffixIndex >= 0)
+				name = name.Remove(suffixIndex) + name.Substring(suffixIndex + suffix.Length);
+
+			int id;
+			return Int32.TryParse(name, out id) ? String.Format("Hairstyle #{0:000}", id) : name;
 		}
 
 		private void InitializeSpriteRetrieveComponent() {
@@ -500,6 +552,18 @@ namespace ActEditor.Core.WPF.EditorControls {
 			Update(true);
 		}
 
+		private void _styleId_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+			if (_initializingStyle || !(_styleId.SelectedItem is HeadStyleChoice choice))
+				return;
+
+			_resourceActPath = choice.ActPath;
+			_filePath = choice.ActPath ?? "";
+			ActEditorConfiguration.ConfigAsker["[ActEditor - Resource path - " + _name + "]"] = _resourceActPath ?? "";
+			ActEditorConfiguration.ConfigAsker["[ActEditor - Path - " + _name + "]"] = _filePath;
+			OnFilePathChanged();
+			Update(true);
+		}
+
 		private void _fancyButton_Click(object sender, RoutedEventArgs e) {
 			_fancyButtons.ForEach(p => p.IsStatePressed = false);
 
@@ -537,6 +601,8 @@ namespace ActEditor.Core.WPF.EditorControls {
 			set {
 				_sex = value;
 				ActEditorConfiguration.ConfigAsker["[ActEditor - Gender - " + _name + "]"] = value.ToString();
+				if (_name == "Head")
+					ReloadStyleChoices();
 				_updateGenderButton();
 				Update(true);
 			}
@@ -640,6 +706,28 @@ namespace ActEditor.Core.WPF.EditorControls {
 			// Ragnarok palettes do not store a usable alpha channel.  Applying the
 			// raw bytes makes every indexed colour transparent in the renderer.
 			sprite.Palette = new Pal(palette, Pal.FormatMode.NoTransparencyExceptFirstPixel);
+		}
+
+		private sealed class HeadStyleChoice {
+			public string ActPath { get; private set; }
+			public string DisplayName { get; private set; }
+			public int SortId { get; private set; }
+
+			public HeadStyleChoice(string actPath, string displayName) {
+				ActPath = actPath;
+				DisplayName = displayName;
+				if (String.IsNullOrEmpty(actPath)) {
+					SortId = -1;
+					return;
+				}
+				string digits = new string(Path.GetFileNameWithoutExtension(actPath).TakeWhile(Char.IsDigit).ToArray());
+				int sortId;
+				SortId = Int32.TryParse(digits, out sortId) ? sortId : Int32.MaxValue;
+			}
+
+			public override string ToString() {
+				return DisplayName;
+			}
 		}
 	}
 }

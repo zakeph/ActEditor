@@ -19,8 +19,12 @@
         </Grid.ColumnDefinitions>
 		<StackPanel Name="_referenceOptions" VerticalAlignment="Center">
 			<CheckBox Name="_cbRef" Content="Nearby" VerticalAlignment="Center" Margin="3" Foreground="{DynamicResource TextForeground}" />
+			<DockPanel Name="_stylePanel" Visibility="Collapsed" Margin="3 0 3 3">
+				<TextBlock Text="HStyle" VerticalAlignment="Center" Margin="0 0 5 0" />
+				<ComboBox Name="_styleId" Width="135" Height="22" SelectionChanged="_styleId_SelectionChanged" />
+			</DockPanel>
 			<DockPanel Name="_palettePanel" Visibility="Collapsed" Margin="3 0 3 3">
-				<TextBlock Text="Palettes" VerticalAlignment="Center" Margin="0 0 5 0" />
+				<TextBlock Text="HColor" VerticalAlignment="Center" Margin="0 0 5 0" />
 				<ComboBox Name="_paletteId" Width="64" Height="22" SelectionChanged="_paletteId_SelectionChanged" />
 			</DockPanel>
 		</StackPanel>

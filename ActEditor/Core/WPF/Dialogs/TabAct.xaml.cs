@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -37,6 +38,8 @@ namespace ActEditor.Core.WPF.Dialogs {
 		private readonly ActEditorWindow _actEditor;
 		private readonly Grid _gridRenderer;
 		private bool _disposed;
+		private bool _initializingAllFrameControls;
+		private bool _bulkTransformEditing;
 		public bool IsActLoaded { get; set; }
 
 		public delegate void NewStateChangedEventHandler(object sender);
@@ -236,8 +239,196 @@ namespace ActEditor.Core.WPF.Dialogs {
 							a.Frames.Add(new Frame());
 						}
 					});
+					InitializeAllFrameControls();
+				}
+				else {
+					_allFramesTransform.IsEnabled = false;
 				}
 			}
+		}
+
+		private void InitializeAllFrameControls() {
+			var firstLayer = _act.Actions.SelectMany(action => action.Frames).SelectMany(frame => frame.Layers).FirstOrDefault();
+			_allFramesTransform.IsEnabled = firstLayer != null;
+			if (firstLayer == null)
+				return;
+
+			_initializingAllFrameControls = true;
+			try {
+				_allScaleX.Value = Clamp(firstLayer.ScaleX, _allScaleX.Minimum, _allScaleX.Maximum);
+				_allScaleY.Value = Clamp(firstLayer.ScaleY, _allScaleY.Minimum, _allScaleY.Maximum);
+				_allHeight.Value = Clamp(firstLayer.OffsetY, _allHeight.Minimum, _allHeight.Maximum);
+				_allDirection.Value = Clamp(firstLayer.Rotation > 180 ? firstLayer.Rotation - 360 : firstLayer.Rotation, _allDirection.Minimum, _allDirection.Maximum);
+				UpdateAllFrameLabels();
+			}
+			finally {
+				_initializingAllFrameControls = false;
+			}
+		}
+
+		private static double Clamp(double value, double minimum, double maximum) {
+			return Math.Max(minimum, Math.Min(maximum, value));
+		}
+
+		private void _bulkSlider_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e) {
+			if (_act == null || _bulkTransformEditing)
+				return;
+
+			_act.Commands.BeginNoDelay();
+			_bulkTransformEditing = true;
+		}
+
+		private void _bulkSlider_PreviewMouseLeftButtonUp(object sender, MouseButtonEventArgs e) {
+			if (!_bulkTransformEditing || _act == null)
+				return;
+
+			_act.Commands.End();
+			_bulkTransformEditing = false;
+		}
+
+		private void _allScaleX_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			if (_allScaleXValue != null)
+				_allScaleXValue.Text = _allScaleX.Value.ToString("0.000000");
+			ApplyToAllLayers(layer => layer.ScaleX = (float)_allScaleX.Value, "Scale X on all frames");
+		}
+
+		private void _allScaleY_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			if (_allScaleYValue != null)
+				_allScaleYValue.Text = _allScaleY.Value.ToString("0.000000");
+			ApplyToAllLayers(layer => layer.ScaleY = (float)_allScaleY.Value, "Scale Y on all frames");
+		}
+
+		private void _allHeight_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			if (_allHeightValue != null)
+				_allHeightValue.Text = Math.Round(_allHeight.Value).ToString();
+			ApplyToAllLayers(layer => layer.OffsetY = (int)Math.Round(_allHeight.Value), "Height on all frames");
+		}
+
+		private void _allDirection_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e) {
+			if (_allDirectionValue != null)
+				_allDirectionValue.Text = Math.Round(_allDirection.Value).ToString();
+			ApplyToAllLayers(layer => layer.Rotation = (int)Math.Round(_allDirection.Value), "Direction on all frames");
+		}
+
+		private void _allValue_KeyDown(object sender, KeyEventArgs e) {
+			if (e.Key != Key.Enter)
+				return;
+
+			ApplyTypedAllFrameValue(sender as TextBox);
+			Keyboard.Focus(_gridPrimary);
+			e.Handled = true;
+		}
+
+		private void _allValue_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e) {
+			ApplyTypedAllFrameValue(sender as TextBox);
+		}
+
+		private void ApplyTypedAllFrameValue(TextBox textBox) {
+			if (textBox == null || _initializingAllFrameControls)
+				return;
+
+			double value;
+			if (!TryParseNumber(textBox.Text, out value)) {
+				UpdateAllFrameLabels();
+				return;
+			}
+
+			if (textBox == _allScaleXValue) {
+				value = Clamp(value, _allScaleX.Minimum, _allScaleX.Maximum);
+				if (Math.Abs(_allScaleX.Value - value) < Double.Epsilon)
+					ApplyToAllLayers(layer => layer.ScaleX = (float)value, "Scale X on all frames");
+				else
+					_allScaleX.Value = value;
+			}
+			else if (textBox == _allScaleYValue) {
+				value = Clamp(value, _allScaleY.Minimum, _allScaleY.Maximum);
+				if (Math.Abs(_allScaleY.Value - value) < Double.Epsilon)
+					ApplyToAllLayers(layer => layer.ScaleY = (float)value, "Scale Y on all frames");
+				else
+					_allScaleY.Value = value;
+			}
+			else if (textBox == _allHeightValue) {
+				value = Clamp(Math.Round(value), _allHeight.Minimum, _allHeight.Maximum);
+				if (Math.Abs(_allHeight.Value - value) < Double.Epsilon)
+					ApplyToAllLayers(layer => layer.OffsetY = (int)value, "Height on all frames");
+				else
+					_allHeight.Value = value;
+			}
+			else if (textBox == _allDirectionValue) {
+				value = Clamp(Math.Round(value), _allDirection.Minimum, _allDirection.Maximum);
+				if (Math.Abs(_allDirection.Value - value) < Double.Epsilon)
+					ApplyToAllLayers(layer => layer.Rotation = (int)value, "Direction on all frames");
+				else
+					_allDirection.Value = value;
+			}
+
+			UpdateAllFrameLabels();
+		}
+
+		private static bool TryParseNumber(string text, out double value) {
+			return Double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out value) ||
+			       Double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value) ||
+			       Double.TryParse((text ?? "").Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+		}
+
+		private void _allFramesUndo_Click(object sender, RoutedEventArgs e) {
+			if (_act == null)
+				return;
+
+			try {
+				_act.Commands.Undo();
+				InitializeAllFrameControls();
+				_act.InvalidateVisual();
+			}
+			catch (Exception err) {
+				ErrorHandler.HandleException(err, ErrorLevel.Warning);
+			}
+		}
+
+		private void _allFramesReset_Click(object sender, RoutedEventArgs e) {
+			if (_act == null)
+				return;
+
+			try {
+				_act.Commands.BeginNoDelay();
+				_allScaleX.Value = 1;
+				_allScaleY.Value = 1;
+				_allHeight.Value = 0;
+				_allDirection.Value = 0;
+			}
+			catch {
+				_act.Commands.CancelEdit();
+				throw;
+			}
+			finally {
+				_act.Commands.End();
+			}
+		}
+
+		private void ApplyToAllLayers(System.Action<Layer> update, string commandName) {
+			if (_initializingAllFrameControls || _act == null)
+				return;
+
+			_act.Commands.Backup(act => {
+				foreach (var action in act.Actions) {
+					foreach (var frame in action.Frames) {
+						foreach (var layer in frame.Layers)
+							update(layer);
+					}
+				}
+			}, commandName);
+			_act.InvalidateVisual();
+		}
+
+		private void UpdateAllFrameLabels() {
+			if (_allScaleXValue != null)
+				_allScaleXValue.Text = _allScaleX.Value.ToString("0.000000");
+			if (_allScaleYValue != null)
+				_allScaleYValue.Text = _allScaleY.Value.ToString("0.000000");
+			if (_allHeightValue != null)
+				_allHeightValue.Text = Math.Round(_allHeight.Value).ToString();
+			if (_allDirectionValue != null)
+				_allDirectionValue.Text = Math.Round(_allDirection.Value).ToString();
 		}
 
 		public LayerEditor LayerEditor => _layerEditor;

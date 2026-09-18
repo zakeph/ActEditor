@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows;
+using System.Linq;
 using ActEditor.ApplicationConfiguration;
 using ActEditor.Core.WPF.Dialogs;
 using ErrorManager;
@@ -129,7 +131,9 @@ namespace ActEditor.Core.Scripting.Scripts {
 		private const int _backgroundColor = 0xff00ff;
 		private const int _collectionWidth = 75;
 		private const int _collectionHeight = 100;
+		private const int _collectionMargin = 12;
 		private const int _collectionBackgroundColor = 0xffffff;
+		private const string _collectionTemplateResource = "pack://application:,,,/Resources/Nielily_collection.png";
 
 		public ItemSpriteExport() {
 			IsEnabled = true;
@@ -138,7 +142,7 @@ namespace ActEditor.Core.Scripting.Scripts {
 		public bool IsEnabled { get; set; }
 
 		public object DisplayName {
-			get { return "__IndexOverride,13__%Export Item Sprite..."; }
+			get { return "__IndexOverride,13__%Bulk export item sprites..."; }
 		}
 
 		public string Group {
@@ -154,7 +158,11 @@ namespace ActEditor.Core.Scripting.Scripts {
 		}
 
 		public void Execute(Act act, int selectedActionIndex, int selectedFrameIndex, int[] selectedLayerIndexes) {
-			if (act == null || act.Sprite.NumberOfImagesLoaded == 0)
+			var tabs = ActEditorWindow.Instance?.TabEngine.GetTabs()
+				.Where(tab => tab.Act != null && tab.Act.Sprite.NumberOfImagesLoaded > 0)
+				.ToList();
+
+			if (tabs == null || tabs.Count == 0)
 				return;
 
 			try {
@@ -163,12 +171,6 @@ namespace ActEditor.Core.Scripting.Scripts {
 				if (folder == null)
 					return;
 
-				string name = Path.GetFileNameWithoutExtension(act.LoadedPath);
-				if (String.IsNullOrEmpty(name))
-					name = "item";
-				else
-					name = RemoveGenderPrefix(name);
-
 				string spriteFolder = GrfPath.Combine(folder, "sprite", "¾ÆÀÌÅÛ");
 				string textureFolder = GrfPath.Combine(folder, "texture", "À¯ÀúÀÎÅÍÆäÀÌ½º", "item");
 				string collectionFolder = GrfPath.Combine(folder, "texture", "À¯ÀúÀÎÅÍÆäÀÌ½º", "collection");
@@ -176,7 +178,28 @@ namespace ActEditor.Core.Scripting.Scripts {
 				Directory.CreateDirectory(textureFolder);
 				Directory.CreateDirectory(collectionFolder);
 
-				CreateItemAssets(act.Sprite.Images[0], GrfPath.Combine(textureFolder, name + ".bmp"), GrfPath.Combine(spriteFolder, name), GrfPath.Combine(collectionFolder, name + ".bmp"));
+				int current = 0;
+				var exportedNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+				TaskManager.DisplayTaskC("Bulk export", "Exporting item sprites...", () => current, tabs.Count, isCancelling => {
+					foreach (var tab in tabs) {
+						if (isCancelling())
+							break;
+
+						string name = Path.GetFileNameWithoutExtension(tab.Act.LoadedPath);
+						if (String.IsNullOrEmpty(name))
+							name = "item_" + (current + 1).ToString("0000");
+						else
+							name = RemoveGenderPrefix(name);
+
+						string baseName = name;
+						int duplicateIndex = 2;
+						while (!exportedNames.Add(name))
+							name = baseName + "_" + duplicateIndex++;
+
+						CreateItemAssets(tab.Act.Sprite.Images[0], GrfPath.Combine(textureFolder, name + ".bmp"), GrfPath.Combine(spriteFolder, name), GrfPath.Combine(collectionFolder, name + ".bmp"));
+						current++;
+					}
+				});
 				OpeningService.FileOrFolder(folder);
 			}
 			catch (Exception err) {
@@ -185,7 +208,7 @@ namespace ActEditor.Core.Scripting.Scripts {
 		}
 
 		public bool CanExecute(Act act, int selectedActionIndex, int selectedFrameIndex, int[] selectedLayerIndexes) {
-			return act != null && act.Sprite.NumberOfImagesLoaded > 0;
+			return ActEditorWindow.Instance?.TabEngine.GetTabs().Any(tab => tab.Act != null && tab.Act.Sprite.NumberOfImagesLoaded > 0) == true;
 		}
 
 		private static void CreateItemAssets(GrfImage sprite, string bitmapPath, string spritePath, string collectionBitmapPath) {
@@ -255,8 +278,11 @@ namespace ActEditor.Core.Scripting.Scripts {
 			palette[2] = (byte)(_collectionBackgroundColor >> 16 & 0xff);
 			usedIndexes[0] = true;
 			colorIndexes[_collectionBackgroundColor] = 0;
+			DrawCollectionTemplate(LoadCollectionTemplate(), pixels, palette, colorIndexes, usedIndexes);
 
-			double scale = Math.Min((double)_collectionWidth / source.Width, (double)_collectionHeight / source.Height);
+			int availableWidth = _collectionWidth - _collectionMargin * 2;
+			int availableHeight = _collectionHeight - _collectionMargin * 2;
+			double scale = Math.Min((double)availableWidth / source.Width, (double)availableHeight / source.Height);
 			int width = Math.Max(1, (int)Math.Round(source.Width * scale));
 			int height = Math.Max(1, (int)Math.Round(source.Height * scale));
 			int offsetX = (_collectionWidth - width) / 2;
@@ -277,6 +303,34 @@ namespace ActEditor.Core.Scripting.Scripts {
 			}
 
 			new GrfImage(pixels, _collectionWidth, _collectionHeight, GrfImageType.Indexed8, palette).Save(outputPath);
+		}
+
+		private static GrfImage LoadCollectionTemplate() {
+			var resource = Application.GetResourceStream(new Uri(_collectionTemplateResource, UriKind.Absolute));
+
+			if (resource == null)
+				throw new InvalidOperationException("The collection template could not be loaded.");
+
+			using (resource.Stream)
+			using (MemoryStream output = new MemoryStream()) {
+				resource.Stream.CopyTo(output);
+				return new GrfImage(output.ToArray());
+			}
+		}
+
+		private static void DrawCollectionTemplate(GrfImage template, byte[] pixels, byte[] palette, Dictionary<int, byte> colorIndexes, bool[] usedIndexes) {
+			if (template.Width != _collectionWidth || template.Height != _collectionHeight)
+				throw new InvalidOperationException("The collection template must be 75x100 pixels.");
+
+			for (int y = 0; y < _collectionHeight; y++) {
+				for (int x = 0; x < _collectionWidth; x++) {
+					int color;
+					if (!TryGetSpriteColor(template, x, y, out color))
+						continue;
+
+					pixels[y * _collectionWidth + x] = GetPaletteIndex(color, palette, colorIndexes, usedIndexes);
+				}
+			}
 		}
 
 		private static bool TryGetSpriteColor(GrfImage source, int x, int y, out int color) {
