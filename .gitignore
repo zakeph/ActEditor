@@ -15,3 +15,4 @@ _ReSharper
 /shader_compile.txt
 /ActEditor/Resources/*.psd
 /rAthena
+/graphify-out
