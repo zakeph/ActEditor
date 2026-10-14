@@ -1,0 +1,11 @@
+togekiss ACT/SPR
+Front: 95 frames / 4800 ms / offset Y -27
+Back: 95 frames / 4800 ms / offset Y -27
+Exact opaque colors: 11
+Unique indexed sprites: 48
+ACT actions: 40
+Round-trip frames checked: 3840
+Native ACT renderer distinct poses per direction checked: 192
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: True / RGB 74,90,115 / changed ink pixels across GIF frames: 23586 / pupil black pixels retained: 467
+PASS: 3840 frames compared between saved original and adjusted ACT/SPR. Only source neutral ink -> chosen RGB; protected pupils retained; alpha, sizes, timing, alignment and mirrors unchanged. Changed pixel occurrences in ACT: 476640.

@@ -1,0 +1,150 @@
+{
+  "ok": true,
+  "species": 13,
+  "frames": 3003,
+  "stats": [
+    {
+      "name": "gengar",
+      "outline": [
+        74,
+        41,
+        74
+      ],
+      "frontFrames": 88,
+      "backFrames": 88,
+      "preservedPixels": 0
+    },
+    {
+      "name": "geodude",
+      "outline": [
+        66,
+        58,
+        49
+      ],
+      "frontFrames": 103,
+      "backFrames": 106,
+      "preservedPixels": 512
+    },
+    {
+      "name": "gible",
+      "outline": [
+        49,
+        66,
+        82
+      ],
+      "frontFrames": 125,
+      "backFrames": 125,
+      "preservedPixels": 1000
+    },
+    {
+      "name": "goldeen",
+      "outline": [
+        82,
+        82,
+        90
+      ],
+      "frontFrames": 114,
+      "backFrames": 114,
+      "preservedPixels": 540
+    },
+    {
+      "name": "haxorus",
+      "outline": [
+        66,
+        66,
+        0
+      ],
+      "frontFrames": 182,
+      "backFrames": 185,
+      "preservedPixels": 189
+    },
+    {
+      "name": "hydreigon",
+      "outline": [
+        41,
+        33,
+        41
+      ],
+      "frontFrames": 75,
+      "backFrames": 75,
+      "preservedPixels": 0
+    },
+    {
+      "name": "jolteon",
+      "outline": [
+        90,
+        74,
+        16
+      ],
+      "frontFrames": 99,
+      "backFrames": 99,
+      "preservedPixels": 768
+    },
+    {
+      "name": "kingdra",
+      "outline": [
+        74,
+        90,
+        148
+      ],
+      "frontFrames": 54,
+      "backFrames": 54,
+      "preservedPixels": 158
+    },
+    {
+      "name": "leafeon",
+      "outline": [
+        58,
+        41,
+        25
+      ],
+      "frontFrames": 137,
+      "backFrames": 137,
+      "preservedPixels": 0
+    },
+    {
+      "name": "lucario",
+      "outline": [
+        16,
+        74,
+        123
+      ],
+      "frontFrames": 143,
+      "backFrames": 143,
+      "preservedPixels": 382
+    },
+    {
+      "name": "ludicolo",
+      "outline": [
+        74,
+        107,
+        74
+      ],
+      "frontFrames": 76,
+      "backFrames": 83,
+      "preservedPixels": 242
+    },
+    {
+      "name": "metagross",
+      "outline": [
+        49,
+        58,
+        99
+      ],
+      "frontFrames": 105,
+      "backFrames": 103,
+      "preservedPixels": 315
+    },
+    {
+      "name": "milotic",
+      "outline": [
+        99,
+        41,
+        41
+      ],
+      "frontFrames": 191,
+      "backFrames": 199,
+      "preservedPixels": 573
+    }
+  ]
+}

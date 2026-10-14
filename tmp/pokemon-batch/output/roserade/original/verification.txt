@@ -1,0 +1,10 @@
+roserade ACT/SPR
+Front: 203 frames / 12000 ms / offset Y -29
+Back: 203 frames / 12000 ms / offset Y -29
+Exact opaque colors: 15
+Unique indexed sprites: 47
+ACT actions: 40
+Round-trip frames checked: 9600
+Native ACT renderer distinct poses per direction checked: 188
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 41,82,82 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

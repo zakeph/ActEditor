@@ -1,0 +1,10 @@
+sudowoodo ACT/SPR
+Front: 67 frames / 4300 ms / offset Y -29
+Back: 67 frames / 4300 ms / offset Y -27
+Exact opaque colors: 12
+Unique indexed sprites: 27
+ACT actions: 40
+Round-trip frames checked: 3440
+Native ACT renderer distinct poses per direction checked: 108
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 99,90,74 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

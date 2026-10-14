@@ -1,0 +1,11 @@
+forretress ACT/SPR
+Front: 54 frames / 2700 ms / offset Y -29
+Back: 54 frames / 2700 ms / offset Y -29
+Exact opaque colors: 12
+Unique indexed sprites: 81
+ACT actions: 40
+Round-trip frames checked: 2160
+Native ACT renderer distinct poses per direction checked: 324
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: True / RGB 82,66,99 / changed ink pixels across GIF frames: 36763 / pupil black pixels retained: 624
+PASS: 2160 frames compared between saved original and adjusted ACT/SPR. Only source neutral ink -> chosen RGB; protected pupils retained; alpha, sizes, timing, alignment and mirrors unchanged. Changed pixel occurrences in ACT: 735260.

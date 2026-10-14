@@ -1,0 +1,10 @@
+Sprigatito ACT/SPR trial
+Front: 53 frames / 4240 ms / offset Y -22
+Back: 5 frames / 450 ms / offset Y -22
+Exact opaque colors: 27
+Unique indexed sprites: 19
+ACT actions: 40
+Round-trip frames checked: 1160
+Native ACT renderer frames checked: 232
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+PASS: all four original files retain their SHA-256 hashes.

@@ -1,0 +1,10 @@
+arcanine ACT/SPR
+Front: 71 frames / 3600 ms / offset Y -35
+Back: 71 frames / 3600 ms / offset Y -35
+Exact opaque colors: 13
+Unique indexed sprites: 18
+ACT actions: 40
+Round-trip frames checked: 2880
+Native ACT renderer distinct poses per direction checked: 72
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 99,66,33 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

@@ -1,0 +1,10 @@
+emolga ACT/SPR
+Front: 188 frames / 9450 ms / offset Y -38
+Back: 186 frames / 9450 ms / offset Y -38
+Exact opaque colors: 15
+Unique indexed sprites: 148
+ACT actions: 40
+Round-trip frames checked: 7560
+Native ACT renderer distinct poses per direction checked: 592
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 33,33,33 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

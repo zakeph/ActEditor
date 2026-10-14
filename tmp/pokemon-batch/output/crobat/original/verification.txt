@@ -1,0 +1,10 @@
+crobat ACT/SPR
+Front: 95 frames / 4800 ms / offset Y -36
+Back: 95 frames / 4800 ms / offset Y -32
+Exact opaque colors: 13
+Unique indexed sprites: 31
+ACT actions: 40
+Round-trip frames checked: 3840
+Native ACT renderer distinct poses per direction checked: 124
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 99,25,123 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

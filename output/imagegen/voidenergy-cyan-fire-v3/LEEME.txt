@@ -1,0 +1,28 @@
+FUEGO CIAN DELICADO — VERSIÓN 3
+
+Siete PNG separados de 204 × 185 píxeles, en el mismo orden y con los mismos
+nombres. Se mantiene el movimiento aprobado de la versión 2.
+
+Retoque de acabado: únicamente cambia la transparencia. Los colores, las
+formas, las posiciones y los límites de cada imagen permanecen iguales.
+La intensidad alfa total baja aproximadamente un 45 %. En las dos primeras
+coronas del contorno baja aproximadamente un 84 %.
+
+Se aplica una transición suave de 4,5 píxeles hacia el interior de todos los
+bordes, incluidos los huecos internos. No se extiende el efecto hacia fuera
+ni se dibuja un halo adicional. Se conserva transparencia suave en las
+lenguas finas y un alfa máximo de 148/255.
+
+Referencia de acabado generada con image_gen. Prompt: conservar exactamente
+la pose, escala, márgenes y lenguas del fuego cian; reducir aproximadamente a
+la mitad la fuerza visual; dar un aspecto etéreo, elegante y delicado; hacer
+que todos los contornos se desvanezcan gradualmente hacia la transparencia
+en 4–6 píxeles a resolución nativa, sin reborde saturado, contorno azul duro,
+blancos intensos ni elementos nuevos.
+
+Para conservar exactamente el movimiento, el retoque final del alfa se aplica
+de forma uniforme a los siete fotogramas de la versión 2, sin regenerar su
+geometría ni desplazar píxeles. Comprobado sobre fondos claros y oscuros.
+
+El ZIP contiene únicamente los siete PNG separados, sin vista conjunta.
+Los originales y las versiones anteriores no se han sobrescrito.

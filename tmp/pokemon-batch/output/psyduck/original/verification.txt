@@ -1,0 +1,10 @@
+psyduck ACT/SPR
+Front: 44 frames / 5000 ms / offset Y -23
+Back: 46 frames / 4700 ms / offset Y -22
+Exact opaque colors: 11
+Unique indexed sprites: 32
+ACT actions: 40
+Round-trip frames checked: 3880
+Native ACT renderer distinct poses per direction checked: 128
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 148,90,16 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

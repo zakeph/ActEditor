@@ -1,0 +1,11 @@
+claydol ACT/SPR
+Front: 101 frames / 6950 ms / offset Y -36
+Back: 101 frames / 6950 ms / offset Y -36
+Exact opaque colors: 14
+Unique indexed sprites: 58
+ACT actions: 40
+Round-trip frames checked: 5560
+Native ACT renderer distinct poses per direction checked: 232
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: True / RGB 41,41,33 / changed ink pixels across GIF frames: 44841 / pupil black pixels retained: 606
+PASS: 5560 frames compared between saved original and adjusted ACT/SPR. Only source neutral ink -> chosen RGB; protected pupils retained; alpha, sizes, timing, alignment and mirrors unchanged. Changed pixel occurrences in ACT: 1232680.

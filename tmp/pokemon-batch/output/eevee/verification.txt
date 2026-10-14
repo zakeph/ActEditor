@@ -1,0 +1,11 @@
+eevee ACT/SPR
+Front: 125 frames / 6700 ms / offset Y -24
+Back: 133 frames / 6700 ms / offset Y -25
+Exact opaque colors: 9
+Unique indexed sprites: 59
+ACT actions: 40
+Round-trip frames checked: 5360
+Native ACT renderer distinct poses per direction checked: 236
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: True / RGB 82,49,33 / changed ink pixels across GIF frames: 30330 / pupil black pixels retained: 1612
+PASS: 5360 frames compared between saved original and adjusted ACT/SPR. Only source neutral ink -> chosen RGB; protected pupils retained; alpha, sizes, timing, alignment and mirrors unchanged. Changed pixel occurrences in ACT: 635180.

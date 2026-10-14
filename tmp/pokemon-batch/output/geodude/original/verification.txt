@@ -1,0 +1,10 @@
+geodude ACT/SPR
+Front: 103 frames / 5350 ms / offset Y -23
+Back: 106 frames / 5350 ms / offset Y -26
+Exact opaque colors: 12
+Unique indexed sprites: 57
+ACT actions: 40
+Round-trip frames checked: 4280
+Native ACT renderer distinct poses per direction checked: 228
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 66,58,49 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

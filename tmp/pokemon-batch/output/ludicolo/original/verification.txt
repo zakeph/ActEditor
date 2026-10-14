@@ -1,0 +1,10 @@
+ludicolo ACT/SPR
+Front: 76 frames / 6400 ms / offset Y -40
+Back: 83 frames / 6400 ms / offset Y -39
+Exact opaque colors: 15
+Unique indexed sprites: 36
+ACT actions: 40
+Round-trip frames checked: 5120
+Native ACT renderer distinct poses per direction checked: 144
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 74,107,74 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

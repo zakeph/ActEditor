@@ -1,0 +1,11 @@
+staryu ACT/SPR
+Front: 79 frames / 4000 ms / offset Y -25
+Back: 79 frames / 4000 ms / offset Y -26
+Exact opaque colors: 14
+Unique indexed sprites: 30
+ACT actions: 40
+Round-trip frames checked: 3200
+Native ACT renderer distinct poses per direction checked: 120
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: True / RGB 90,66,49 / changed ink pixels across GIF frames: 18578 / pupil black pixels retained: 0
+PASS: 3200 frames compared between saved original and adjusted ACT/SPR. Only source neutral ink -> chosen RGB; protected pupils retained; alpha, sizes, timing, alignment and mirrors unchanged. Changed pixel occurrences in ACT: 375920.

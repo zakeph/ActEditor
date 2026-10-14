@@ -1,0 +1,10 @@
+kingdra ACT/SPR
+Front: 54 frames / 2700 ms / offset Y -46
+Back: 54 frames / 2700 ms / offset Y -47
+Exact opaque colors: 13
+Unique indexed sprites: 108
+ACT actions: 40
+Round-trip frames checked: 2160
+Native ACT renderer distinct poses per direction checked: 432
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 74,90,148 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

@@ -1,0 +1,10 @@
+leafeon ACT/SPR
+Front: 137 frames / 7750 ms / offset Y -30
+Back: 137 frames / 7750 ms / offset Y -31
+Exact opaque colors: 15
+Unique indexed sprites: 68
+ACT actions: 40
+Round-trip frames checked: 6200
+Native ACT renderer distinct poses per direction checked: 272
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 58,41,25 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

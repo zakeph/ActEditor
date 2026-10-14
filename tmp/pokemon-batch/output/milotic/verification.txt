@@ -1,0 +1,11 @@
+milotic ACT/SPR
+Front: 191 frames / 10000 ms / offset Y -39
+Back: 199 frames / 10000 ms / offset Y -40
+Exact opaque colors: 13
+Unique indexed sprites: 95
+ACT actions: 40
+Round-trip frames checked: 8000
+Native ACT renderer distinct poses per direction checked: 380
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: True / RGB 99,41,41 / changed ink pixels across GIF frames: 130896 / pupil black pixels retained: 573
+PASS: 8000 frames compared between saved original and adjusted ACT/SPR. Only source neutral ink -> chosen RGB; protected pupils retained; alpha, sizes, timing, alignment and mirrors unchanged. Changed pixel occurrences in ACT: 2682960.

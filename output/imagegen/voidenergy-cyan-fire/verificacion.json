@@ -1,0 +1,100 @@
+[
+  {
+    "file": "³²_dv_voidenergy_cyan_0000.png",
+    "width": 204,
+    "height": 185,
+    "bounds": [
+      0,
+      5,
+      180,
+      154
+    ],
+    "transparentPixels": 27854,
+    "partialAlphaPixels": 9096,
+    "sha256": "BE09D786F2D13931DF8642699D511AF8B31A88D1961DB2098D1EFD2963E8A4D5"
+  },
+  {
+    "file": "³²_dv_voidenergy_cyan_0001.png",
+    "width": 204,
+    "height": 185,
+    "bounds": [
+      4,
+      7,
+      175,
+      156
+    ],
+    "transparentPixels": 27430,
+    "partialAlphaPixels": 9365,
+    "sha256": "A1C2681699368F2A59F6CB7AC2BBB47729937107CDBBFA37F38642560B4F427E"
+  },
+  {
+    "file": "³²_dv_voidenergy_cyan_0002.png",
+    "width": 204,
+    "height": 185,
+    "bounds": [
+      6,
+      13,
+      197,
+      147
+    ],
+    "transparentPixels": 28058,
+    "partialAlphaPixels": 8666,
+    "sha256": "DB7A9E24F0B2BD1EBB80080E1DF528AD1CEEEFDB062333A9D9527257746D83BD"
+  },
+  {
+    "file": "³²_dv_voidenergy_cyan_0003.png",
+    "width": 204,
+    "height": 185,
+    "bounds": [
+      7,
+      8,
+      195,
+      169
+    ],
+    "transparentPixels": 23357,
+    "partialAlphaPixels": 13519,
+    "sha256": "0C42935812673DD0965E2E9E602CC478A5B3C0D8314623EB5D4285729686BE63"
+  },
+  {
+    "file": "³²_dv_voidenergy_cyan_0004.png",
+    "width": 204,
+    "height": 185,
+    "bounds": [
+      3,
+      0,
+      198,
+      184
+    ],
+    "transparentPixels": 22056,
+    "partialAlphaPixels": 14854,
+    "sha256": "CF08A8F9EDAE274164691595DA9DE8933667EFC09B3E84040D266E1C9B533B67"
+  },
+  {
+    "file": "³²_dv_voidenergy_cyan_0005.png",
+    "width": 204,
+    "height": 185,
+    "bounds": [
+      4,
+      3,
+      195,
+      174
+    ],
+    "transparentPixels": 25034,
+    "partialAlphaPixels": 11686,
+    "sha256": "CEF660BEB8F468FAFE8E5AF7CBF7A987F1AB8057A959968A25400640F2640BFF"
+  },
+  {
+    "file": "³²_dv_voidenergy_cyan_0006.png",
+    "width": 204,
+    "height": 185,
+    "bounds": [
+      6,
+      5,
+      187,
+      169
+    ],
+    "transparentPixels": 27387,
+    "partialAlphaPixels": 9417,
+    "sha256": "9EF682FBEFFDACF2908D6B169D6F667A79038C3A377BC462C028A7BBAA614C51"
+  }
+]

@@ -1,0 +1,33 @@
+FUEGO CIAN SUAVE — VERSIÓN 2
+
+Siete PNG separados de 204 × 185 píxeles, con los nombres y el orden originales.
+Se conservan el lienzo y los límites ocupados de cada fotograma.
+
+Los efectos se han vuelto a editar con image_gen usando los PNG originales
+como referencia de composición y una referencia común de acabado suave.
+
+Prompt común: sustituir los rayos por pocas lenguas amplias y curvas de fuego
+cian/turquesa. Mantener pose, escala, márgenes y posición de las partes
+separadas. Usar degradados suaves, azul discreto en el interior, bordes difusos
+y cuerpo translúcido. Eliminar grietas negras, filigrana, trazos finos, blancos
+intensos y bordes duros. PNG con transparencia real. Sin humo, texto ni
+elementos adicionales.
+
+Tras la generación: reducción bicúbica desde alta resolución; suavizado RGBA
+premultiplicado; calibración de la distribución alfa de cada imagen usando
+su original; ajuste de color al cian original. No se emplea el alfa original
+como máscara espacial, para evitar recuperar las grietas eléctricas.
+
+Comparación de medianas alfa (0 transparente, 255 opaco):
+Fotograma   Original   Corregido
+0000        138        138
+0001        152        151
+0002        112        112
+0003        138        140
+0004        157        157
+0005        112        113
+0006         85         84
+
+Se verificó la translucidez visual sobre fondos claros y oscuros.
+El ZIP contiene únicamente los siete PNG separados, sin vista conjunta.
+Los archivos originales PNG, SPR y ACT no se han sobrescrito.

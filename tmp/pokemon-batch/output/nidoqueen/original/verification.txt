@@ -1,0 +1,10 @@
+nidoqueen ACT/SPR
+Front: 123 frames / 6400 ms / offset Y -35
+Back: 121 frames / 6400 ms / offset Y -36
+Exact opaque colors: 14
+Unique indexed sprites: 46
+ACT actions: 40
+Round-trip frames checked: 5120
+Native ACT renderer distinct poses per direction checked: 184
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 49,74,74 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

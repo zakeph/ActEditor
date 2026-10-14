@@ -82,6 +82,7 @@ namespace ActEditor.Core.DrawingComponents {
 			}
 			
 			_drawSlot = renderer.DrawSlotManager.GetDrawSlot(_lastDrawIndex);
+			_drawSlot.Owner = this;
 
 			_border = _drawSlot.Border;
 			_image = _drawSlot.Image;
@@ -264,7 +265,8 @@ namespace ActEditor.Core.DrawingComponents {
 		}
 
 		public override void QuickRender(FrameRenderer renderer) {
-			if (_image.Visibility != Visibility.Visible)
+			// Cached layers can retain a slot that a later frame assigned to another layer.
+			if (_drawSlot == null || _drawSlot.Owner != this || _image.Visibility != Visibility.Visible)
 				return;
 
 			_image.RenderTransform = new MatrixTransform(_transformGroup.Value * renderer.View);
@@ -284,7 +286,7 @@ namespace ActEditor.Core.DrawingComponents {
 		}
 
 		public void DrawSelection() {
-			if (_border == null || !_act.IsSelectable || _editor.SelectionEngine == null)
+			if (_drawSlot == null || _drawSlot.Owner != this || _border == null || !_act.IsSelectable || _editor.SelectionEngine == null)
 				return;
 
 			if (_image.Visibility == Visibility.Visible) {

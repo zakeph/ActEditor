@@ -394,7 +394,7 @@ namespace ActEditor.Core.WPF.EditorControls {
 			}
 		}
 
-		private void _miAddAfter_Click(object sender, RoutedEventArgs e) => Execute(SpriteEditMode.Add);
+		private void _miAddAfter_Click(object sender, RoutedEventArgs e) => Execute(SpriteEditMode.After);
 		private void _miAddBefore_Click(object sender, RoutedEventArgs e) => Execute(SpriteEditMode.Before);
 		private void _miRemove_Click(object sender, RoutedEventArgs e) => Execute(SpriteEditMode.Remove);
 		private void _miReplace_Click(object sender, RoutedEventArgs e) => Execute(SpriteEditMode.Replace);

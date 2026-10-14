@@ -1,0 +1,20 @@
+FUEGO CIAN — PNG SEPARADOS
+
+Siete fotogramas PNG transparentes, de 204 × 185 píxeles cada uno.
+Conservan los nombres y el orden 0000–0006 de los efectos originales.
+Cada imagen conserva el lienzo y los límites ocupados del fotograma correspondiente.
+La firma 0007 no forma parte de los efectos editados.
+
+Edición realizada con la herramienta integrada image_gen, una edición por PNG.
+Prompt común: sustituir únicamente los rayos por fuego cian/turquesa dibujado en
+2D, con lenguas curvas, remolinos y pliegues azules. Mantener pose, escala,
+posición de las masas separadas y proporciones originales. Eliminar grietas
+negras y arcos eléctricos. Fondo realmente transparente. Sin tonos naranja,
+rojo o amarillo, humo, sombras, texto, bordes ni elementos nuevos.
+
+El primer fotograma se describe como una cinta doblada en U; los restantes
+usan su PNG original como referencia de la composición de cada pose.
+Las imágenes generadas se redujeron y alinearon al lienzo y a los límites alfa
+originales. La secuencia se revisó visualmente en el orden de los archivos.
+
+Los archivos originales PNG, SPR y ACT permanecen en su ubicación original.

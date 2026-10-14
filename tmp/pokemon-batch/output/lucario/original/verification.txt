@@ -1,0 +1,10 @@
+lucario ACT/SPR
+Front: 143 frames / 7200 ms / offset Y -32
+Back: 143 frames / 7200 ms / offset Y -33
+Exact opaque colors: 14
+Unique indexed sprites: 34
+ACT actions: 40
+Round-trip frames checked: 5760
+Native ACT renderer distinct poses per direction checked: 136
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 16,74,123 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

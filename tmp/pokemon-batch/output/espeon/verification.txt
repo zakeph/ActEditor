@@ -1,0 +1,11 @@
+espeon ACT/SPR
+Front: 150 frames / 7600 ms / offset Y -29
+Back: 143 frames / 7600 ms / offset Y -28
+Exact opaque colors: 12
+Unique indexed sprites: 89
+ACT actions: 40
+Round-trip frames checked: 6080
+Native ACT renderer distinct poses per direction checked: 356
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: True / RGB 123,74,123 / changed ink pixels across GIF frames: 51592 / pupil black pixels retained: 161
+PASS: 6080 frames compared between saved original and adjusted ACT/SPR. Only source neutral ink -> chosen RGB; protected pupils retained; alpha, sizes, timing, alignment and mirrors unchanged. Changed pixel occurrences in ACT: 1065640.

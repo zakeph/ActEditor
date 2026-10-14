@@ -1,0 +1,10 @@
+glaceon ACT/SPR
+Front: 171 frames / 8600 ms / offset Y -27
+Back: 171 frames / 8600 ms / offset Y -27
+Exact opaque colors: 11
+Unique indexed sprites: 51
+ACT actions: 40
+Round-trip frames checked: 6880
+Native ACT renderer distinct poses per direction checked: 204
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 49,58,74 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

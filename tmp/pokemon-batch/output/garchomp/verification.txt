@@ -1,0 +1,11 @@
+garchomp ACT/SPR
+Front: 89 frames / 8000 ms / offset Y -40
+Back: 89 frames / 8000 ms / offset Y -42
+Exact opaque colors: 15
+Unique indexed sprites: 52
+ACT actions: 40
+Round-trip frames checked: 6400
+Native ACT renderer distinct poses per direction checked: 208
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: True / RGB 41,41,82 / changed ink pixels across GIF frames: 35395 / pupil black pixels retained: 356
+PASS: 6400 frames compared between saved original and adjusted ACT/SPR. Only source neutral ink -> chosen RGB; protected pupils retained; alpha, sizes, timing, alignment and mirrors unchanged. Changed pixel occurrences in ACT: 1274220.

@@ -1,0 +1,11 @@
+excadrill ACT/SPR
+Front: 167 frames / 9000 ms / offset Y -38
+Back: 169 frames / 9000 ms / offset Y -40
+Exact opaque colors: 14
+Unique indexed sprites: 57
+ACT actions: 40
+Round-trip frames checked: 7200
+Native ACT renderer distinct poses per direction checked: 228
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: True / RGB 41,33,25 / changed ink pixels across GIF frames: 108734 / pupil black pixels retained: 525
+PASS: 7200 frames compared between saved original and adjusted ACT/SPR. Only source neutral ink -> chosen RGB; protected pupils retained; alpha, sizes, timing, alignment and mirrors unchanged. Changed pixel occurrences in ACT: 2329120.

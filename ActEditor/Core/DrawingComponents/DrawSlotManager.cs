@@ -9,6 +9,7 @@ namespace ActEditor.Core.DrawingComponents {
 	public class DrawSlot {
 		public Image Image = new Image();
 		public Border Border = new Border();
+		public LayerDraw Owner;
 		public bool InUse;
 		public bool IsConfigured;
 	}

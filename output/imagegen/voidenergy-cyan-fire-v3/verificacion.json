@@ -1,0 +1,86 @@
+﻿[
+    {
+        "file":  "³²_dv_voidenergy_cyan_0000.png",
+        "width":  204,
+        "height":  185,
+        "strength":  0.58,
+        "featherPixels":  4.5,
+        "alphaEnergyRatio":  0.555765595463138,
+        "edgeAlphaRatio":  0.16428571428571428,
+        "maximumAlpha":  147,
+        "rgbChanges":  0,
+        "addedPixels":  0
+    },
+    {
+        "file":  "³²_dv_voidenergy_cyan_0001.png",
+        "width":  204,
+        "height":  185,
+        "strength":  0.58,
+        "featherPixels":  4.5,
+        "alphaEnergyRatio":  0.54815194945754764,
+        "edgeAlphaRatio":  0.16503171186269269,
+        "maximumAlpha":  147,
+        "rgbChanges":  0,
+        "addedPixels":  0
+    },
+    {
+        "file":  "³²_dv_voidenergy_cyan_0002.png",
+        "width":  204,
+        "height":  185,
+        "strength":  0.58,
+        "featherPixels":  4.5,
+        "alphaEnergyRatio":  0.55275727059965585,
+        "edgeAlphaRatio":  0.16603267983921888,
+        "maximumAlpha":  147,
+        "rgbChanges":  0,
+        "addedPixels":  0
+    },
+    {
+        "file":  "³²_dv_voidenergy_cyan_0003.png",
+        "width":  204,
+        "height":  185,
+        "strength":  0.58,
+        "featherPixels":  4.5,
+        "alphaEnergyRatio":  0.553195100150602,
+        "edgeAlphaRatio":  0.16035720446372889,
+        "maximumAlpha":  147,
+        "rgbChanges":  0,
+        "addedPixels":  0
+    },
+    {
+        "file":  "³²_dv_voidenergy_cyan_0004.png",
+        "width":  204,
+        "height":  185,
+        "strength":  0.58,
+        "featherPixels":  4.5,
+        "alphaEnergyRatio":  0.55675156380631974,
+        "edgeAlphaRatio":  0.1663269020749909,
+        "maximumAlpha":  148,
+        "rgbChanges":  0,
+        "addedPixels":  0
+    },
+    {
+        "file":  "³²_dv_voidenergy_cyan_0005.png",
+        "width":  204,
+        "height":  185,
+        "strength":  0.58,
+        "featherPixels":  4.5,
+        "alphaEnergyRatio":  0.55467769978635073,
+        "edgeAlphaRatio":  0.16240066458721925,
+        "maximumAlpha":  147,
+        "rgbChanges":  0,
+        "addedPixels":  0
+    },
+    {
+        "file":  "³²_dv_voidenergy_cyan_0006.png",
+        "width":  204,
+        "height":  185,
+        "strength":  0.58,
+        "featherPixels":  4.5,
+        "alphaEnergyRatio":  0.55150715494330882,
+        "edgeAlphaRatio":  0.15506580283145985,
+        "maximumAlpha":  147,
+        "rgbChanges":  0,
+        "addedPixels":  0
+    }
+]

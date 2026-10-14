@@ -302,24 +302,19 @@ namespace ActEditor.Components {
 		private static Act MergeGifReference(Act current, Act reference, bool front, bool preservePartialAlpha) {
 			reference = PrepareGifReference(reference, preservePartialAlpha);
 			int indexedImagesBeforeMerge = current.Sprite.NumberOfIndexed8Images;
-			var layerCounts = current.GetAllFrames().Select(frame => frame.NumberOfLayers).ToList();
+			int imageCountBeforeMerge = current.Sprite.NumberOfImagesLoaded;
 			var merged = front
 				? Act.MergeAct(new Act[0], current, new[] { reference })
 				: Act.MergeAct(new[] { reference }, current, new Act[0]);
 
-			// Act.MergeAct uses the total image count as the BGRA offset. BGRA indexes are
-			// relative to the BGRA section, so remove the indexed-image portion again.
-			int frameIndex = 0;
-			foreach (var frame in merged.GetAllFrames()) {
-				int previousLayerCount = layerCounts[frameIndex++];
-				int addedLayerCount = frame.NumberOfLayers - previousLayerCount;
-				int firstAddedLayer = front ? previousLayerCount : 0;
-
-				for (int i = firstAddedLayer; i < firstAddedLayer + addedLayerCount; i++) {
-					var layer = frame.Layers[i];
-					if (layer.IsBgra32())
-						layer.SpriteIndex -= indexedImagesBeforeMerge;
-				}
+			// Anchored references may also add layers using existing sprites. Only newly
+			// imported indexes have the absolute image offset added by Act.MergeAct.
+			// Snapshot indexes before editing: frames may share the same Layer instance.
+			var importedLayers = merged.GetAllLayers()
+				.Where(layer => layer.IsBgra32() && layer.SpriteIndex >= imageCountBeforeMerge)
+				.Select(layer => new { Layer = layer, Index = layer.SpriteIndex }).ToList();
+			foreach (var imported in importedLayers) {
+				imported.Layer.SpriteIndex = imported.Index - indexedImagesBeforeMerge;
 			}
 
 			return merged;

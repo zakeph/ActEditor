@@ -1,0 +1,170 @@
+[
+  {
+    "name": "aerodactyl",
+    "width": 93,
+    "height": 81,
+    "frames": 17
+  },
+  {
+    "name": "aerodactyl-back",
+    "width": 91,
+    "height": 91,
+    "frames": 17
+  },
+  {
+    "name": "aggron",
+    "width": 77,
+    "height": 76,
+    "frames": 109
+  },
+  {
+    "name": "aggron-back",
+    "width": 68,
+    "height": 77,
+    "frames": 117
+  },
+  {
+    "name": "arcanine",
+    "width": 77,
+    "height": 69,
+    "frames": 71
+  },
+  {
+    "name": "arcanine-back",
+    "width": 86,
+    "height": 69,
+    "frames": 71
+  },
+  {
+    "name": "claydol",
+    "width": 70,
+    "height": 72,
+    "frames": 101
+  },
+  {
+    "name": "claydol-back",
+    "width": 70,
+    "height": 72,
+    "frames": 101
+  },
+  {
+    "name": "cradily",
+    "width": 60,
+    "height": 79,
+    "frames": 132
+  },
+  {
+    "name": "cradily-back",
+    "width": 64,
+    "height": 79,
+    "frames": 133
+  },
+  {
+    "name": "crobat",
+    "width": 106,
+    "height": 72,
+    "frames": 95
+  },
+  {
+    "name": "crobat-back",
+    "width": 107,
+    "height": 63,
+    "frames": 95
+  },
+  {
+    "name": "eevee",
+    "width": 49,
+    "height": 47,
+    "frames": 125
+  },
+  {
+    "name": "eevee-back",
+    "width": 49,
+    "height": 50,
+    "frames": 133
+  },
+  {
+    "name": "electivire",
+    "width": 96,
+    "height": 85,
+    "frames": 103
+  },
+  {
+    "name": "electivire-back",
+    "width": 102,
+    "height": 85,
+    "frames": 103
+  },
+  {
+    "name": "emolga",
+    "width": 83,
+    "height": 76,
+    "frames": 188
+  },
+  {
+    "name": "emolga-back",
+    "width": 92,
+    "height": 76,
+    "frames": 186
+  },
+  {
+    "name": "espeon",
+    "width": 62,
+    "height": 58,
+    "frames": 150
+  },
+  {
+    "name": "espeon-back",
+    "width": 61,
+    "height": 55,
+    "frames": 143
+  },
+  {
+    "name": "excadrill",
+    "width": 91,
+    "height": 76,
+    "frames": 167
+  },
+  {
+    "name": "excadrill-back",
+    "width": 93,
+    "height": 80,
+    "frames": 169
+  },
+  {
+    "name": "flareon",
+    "width": 66,
+    "height": 60,
+    "frames": 119
+  },
+  {
+    "name": "flareon-back",
+    "width": 70,
+    "height": 59,
+    "frames": 119
+  },
+  {
+    "name": "forretress",
+    "width": 63,
+    "height": 57,
+    "frames": 54
+  },
+  {
+    "name": "forretress-back",
+    "width": 66,
+    "height": 57,
+    "frames": 54
+  },
+  {
+    "name": "garchomp",
+    "width": 82,
+    "height": 80,
+    "frames": 89
+  },
+  {
+    "name": "garchomp-back",
+    "width": 89,
+    "height": 83,
+    "frames": 89
+  }
+]

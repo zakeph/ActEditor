@@ -1,0 +1,10 @@
+hydreigon ACT/SPR
+Front: 75 frames / 3750 ms / offset Y -54
+Back: 75 frames / 3750 ms / offset Y -56
+Exact opaque colors: 13
+Unique indexed sprites: 90
+ACT actions: 40
+Round-trip frames checked: 3000
+Native ACT renderer distinct poses per direction checked: 360
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 41,33,41 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

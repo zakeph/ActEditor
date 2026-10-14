@@ -1,0 +1,10 @@
+starmie ACT/SPR
+Front: 159 frames / 8000 ms / offset Y -30
+Back: 159 frames / 8000 ms / offset Y -28
+Exact opaque colors: 15
+Unique indexed sprites: 71
+ACT actions: 40
+Round-trip frames checked: 6400
+Native ACT renderer distinct poses per direction checked: 284
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: False / RGB 49,58,115 / changed ink pixels across GIF frames: 0 / pupil black pixels retained: 0

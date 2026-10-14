@@ -1,0 +1,11 @@
+gengar ACT/SPR
+Front: 88 frames / 4600 ms / offset Y -33
+Back: 88 frames / 4600 ms / offset Y -32
+Exact opaque colors: 11
+Unique indexed sprites: 67
+ACT actions: 40
+Round-trip frames checked: 3680
+Native ACT renderer distinct poses per direction checked: 268
+PASS: opaque colors, alpha, timing, mirrors, alignment, slots and native rendering.
+Outline adjusted: True / RGB 74,41,74 / changed ink pixels across GIF frames: 24655 / pupil black pixels retained: 0
+PASS: 3680 frames compared between saved original and adjusted ACT/SPR. Only source neutral ink -> chosen RGB; protected pupils retained; alpha, sizes, timing, alignment and mirrors unchanged. Changed pixel occurrences in ACT: 515260.
