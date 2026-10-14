@@ -1,6 +1,0 @@
-Abre indice.html para revisar todos los Pokemon y sus comparaciones animadas.
-Cada Pokemon tiene su carpeta con ACT y SPR, que deben permanecer juntos.
-Dragonite conserva su prueba anterior aprobada.
-GIF originales intactos. Negro RGB0/16 recoloreado salvo pupilas revisadas.
-Verificados 213360 pasos ACT por versión y 9840 renderizados distintos por versión.
-Falta comprobar los resultados dentro del juego.

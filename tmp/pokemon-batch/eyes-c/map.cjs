@@ -1,7 +1,0 @@
-const fs=require('fs'),path=require('path');
-const base='D:/xampp/htdocs/ActEditor/tmp/pokemon-batch/probe';
-const [name,side='front',frameS='0',xS='0',yS='0',wS='999',hS='999']=process.argv.slice(2);const m=JSON.parse(fs.readFileSync(`${base}/${name}-${side}.json`,'utf8').replace(/^\uFEFF/,''));const data=fs.readFileSync(`${base}/${name}-${side}.bgra`);const frame=+frameS,x0=+xS,y0=+yS,w=Math.min(+wS,m.width-x0),h=Math.min(+hS,m.height-y0);const labels=new Map();let next=0;let chars='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz123456789';
-const ink=p=>p[3]>0&&p[0]===p[1]&&p[1]===p[2]&&p[0]<=16;function pix(x,y){return data.subarray((frame*m.width*m.height+y*m.width+x)*4,(frame*m.width*m.height+y*m.width+x)*4+4)}
-let lines=[];for(let y=y0;y<y0+h;y++){let str='';for(let x=x0;x<x0+w;x++){const p=pix(x,y);let c='.';if(p[3]){if(ink(p))c='#';else{let k=[p[2],p[1],p[0]].join(',');if(!labels.has(k))labels.set(k,chars[next++]);c=labels.get(k)}}str+=c}lines.push(String(y).padStart(3)+' '+str)}console.log(name,side,frame, m.width,m.height);console.log('    '+Array.from({length:w},(_,i)=>Math.floor((i+x0)/10)%10).join(''));console.log('    '+Array.from({length:w},(_,i)=>(i+x0)%10).join(''));console.log(lines.join('\n'));console.log([...labels].map(([rgb,c])=>`${c}=${rgb}`).join('  '));
-
-console.log("ink",Array.from({length:h},(_,i)=>i+y0).map(y=>[y,Array.from({length:w},(_,i)=>i+x0).filter(x=>ink(pix(x,y)))]).filter(r=>r[1].length));
